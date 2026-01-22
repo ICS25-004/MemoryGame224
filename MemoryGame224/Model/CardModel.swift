@@ -6,8 +6,10 @@
 //
 import SwiftUI
 
-enum Suit: String, CaseIterable {
-	case heart, diamond, club, spade
+enum Suit: String, CaseIterable, Identifiable, Equatable {
+	var id: String { rawValue }
+	
+	case heart, club, diamond, spade
 	
 	var color : Color {
 		switch self {
@@ -25,7 +27,5 @@ enum Suit: String, CaseIterable {
 		}
 	}
 	
-	var title: String {
-			return self.rawValue.capitalized;
-	}
+	var title: String { return self.rawValue.capitalized; }
 }
