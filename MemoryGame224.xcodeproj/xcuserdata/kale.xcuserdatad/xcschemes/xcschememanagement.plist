@@ -4,10 +4,33 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>MemoryGame224.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
 		<key>MemoryGame226.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>245797B52F0C40000038AED1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>245797C22F0C40010038AED1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>245797CC2F0C40010038AED1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

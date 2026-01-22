@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		24FF73092F20466600323A6D /* cards.icon in Resources */ = {isa = PBXBuildFile; fileRef = 24FF73082F20466600323A6D /* cards.icon */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		245797C42F0C40010038AED1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,11 +31,43 @@
 		245797B62F0C40000038AED1 /* MemoryGame224.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemoryGame224.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		245797C32F0C40010038AED1 /* MemoryGame224Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MemoryGame224Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		245797CD2F0C40010038AED1 /* MemoryGame224UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MemoryGame224UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2467BE382F1EFE6600F33262 /* MemoryGame224.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MemoryGame224.xctestplan; sourceTree = "<group>"; };
+		24FF73082F20466600323A6D /* cards.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = cards.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		24A329BF2F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224Tests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/CardModel.swift,
+				View/Cards/CardTabsView.swift,
+			);
+			target = 245797C22F0C40010038AED1 /* MemoryGame224Tests */;
+		};
+		24A329C02F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224UITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/CardModel.swift,
+				View/Cards/CardTabsView.swift,
+				View/Cards/SuitCardView.swift,
+				View/ContentView.swift,
+				View/Helper/SuitPickerView.swift,
+				View/Helper/TabButtonsView.swift,
+				View/Helper/ThumbnailView.swift,
+				View/Pages/GameView.swift,
+				View/Pages/SettingsView.swift,
+			);
+			target = 245797CC2F0C40010038AED1 /* MemoryGame224UITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		245797B82F0C40000038AED1 /* MemoryGame224 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				24A329BF2F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224Tests" target */,
+				24A329C02F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224UITests" target */,
+			);
 			path = MemoryGame224;
 			sourceTree = "<group>";
 		};
@@ -43,6 +79,11 @@
 		245797D02F0C40010038AED1 /* MemoryGame224UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MemoryGame224UITests;
+			sourceTree = "<group>";
+		};
+		246A1D952F15AFC9006DE090 /* ProjectFonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ProjectFonts;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,10 +116,12 @@
 		245797AD2F0C40000038AED1 = {
 			isa = PBXGroup;
 			children = (
+				2467BE382F1EFE6600F33262 /* MemoryGame224.xctestplan */,
 				245797B82F0C40000038AED1 /* MemoryGame224 */,
-				245797C62F0C40010038AED1 /* MemoryGame224Tests */,
-				245797D02F0C40010038AED1 /* MemoryGame224UITests */,
+				24A329C72F1002B00008C926 /* Tests */,
 				245797B72F0C40000038AED1 /* Products */,
+				246A1D952F15AFC9006DE090 /* ProjectFonts */,
+				24FF73082F20466600323A6D /* cards.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +133,15 @@
 				245797CD2F0C40010038AED1 /* MemoryGame224UITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		24A329C72F1002B00008C926 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				245797C62F0C40010038AED1 /* MemoryGame224Tests */,
+				245797D02F0C40010038AED1 /* MemoryGame224UITests */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -109,6 +161,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				245797B82F0C40000038AED1 /* MemoryGame224 */,
+				246A1D952F15AFC9006DE090 /* ProjectFonts */,
 			);
 			name = MemoryGame224;
 			packageProductDependencies = (
@@ -212,6 +265,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24FF73092F20466600323A6D /* cards.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,16 +454,19 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MemoryGame224/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Memory Game";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.card-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.camosun.ics0522047.MemoryGame226;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -433,16 +490,19 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MemoryGame224/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Memory Game";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.card-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.camosun.ics0522047.MemoryGame226;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
