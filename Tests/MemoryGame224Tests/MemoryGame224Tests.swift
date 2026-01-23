@@ -1,6 +1,6 @@
 //
-//  MemoryGame226Tests.swift
-//  MemoryGame226Tests
+//  MemoryGame224Tests.swift
+//  MemoryGame224Tests
 //
 //  Created by Caleb on 2026-01-05.
 //

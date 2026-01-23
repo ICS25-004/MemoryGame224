@@ -36,7 +36,7 @@ struct SettingsView: View {
 				)
 				.padding(.bottom, 30)
 
-			SuitSettingsPickerView(suits: $suits, selectedSuitIndex: $selectedSuitIndex)
+			SettingsSuitPickerView(suits: $suits, selectedSuitIndex: $selectedSuitIndex)
 			Group {
 				Stepper(value: $rows, in: 1...10) {
 					Text("Rows: \( rows)")

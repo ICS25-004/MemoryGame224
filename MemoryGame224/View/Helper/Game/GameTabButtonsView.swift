@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TabButtonsView: View {
+struct GameTabButtonsView: View {
 		@Binding var selection: Int
 		let lowerBound: Int
 		let upperBound: Int

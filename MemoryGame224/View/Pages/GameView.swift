@@ -18,7 +18,7 @@ struct GameView: View {
 					.accessibilityIdentifier("GameView_TabViewPages")
 					.ignoresSafeArea()
 
-					TabButtonsView(selection: $selectedSuitIndex, lowerBound: 0, upperBound: suits.count - 1)
+					GameTabButtonsView(selection: $selectedSuitIndex, lowerBound: 0, upperBound: suits.count - 1)
 							.padding(.horizontal, 24)
 							.padding(.vertical, 50)
 							.ignoresSafeArea(edges: .bottom)

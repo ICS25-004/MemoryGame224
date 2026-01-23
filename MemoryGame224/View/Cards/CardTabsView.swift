@@ -16,7 +16,7 @@ struct CardTabsView: View {
 						.tabViewStyle(.page(indexDisplayMode: .always))
 						.ignoresSafeArea()
 
-						TabButtonsView(
+						GameTabButtonsView(
 							selection: $selectedSuitIndex,
 							lowerBound: 0,
 							upperBound: suits.count - 1

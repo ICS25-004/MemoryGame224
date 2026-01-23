@@ -7,17 +7,16 @@
 
 import SwiftUI
 
-struct TabThumbnailView: View {
-	@State var currentIndex: Int
-	@State var currentSuit: Suit
+struct SettingsTabThumbnailView: View {
+	let currentIndex: Int
+	let currentSuit: Suit
 	
 	@Binding var selectedSuitIndex: Int
 
     var body: some View {
-				return VStack(spacing: 4) {
+				VStack(spacing: 4) {
 					Image(systemName: currentSuit.iconName)
 						.frame(width: 44, height: 44)
-						.contentShape(Rectangle())
 						.foregroundStyle(currentSuit.color)
 						.overlay(
 							RoundedRectangle(cornerRadius: 8)
@@ -27,8 +26,11 @@ struct TabThumbnailView: View {
 							RoundedRectangle(cornerRadius: 8)
 								.fill(Color.white)
 						)
-						.accessibilityIdentifier("ThumbnailView_Icon_\(currentIndex)")
-						.onTapGesture { selectedSuitIndex = currentIndex }
 				}
+				.contentShape(Rectangle())
+				.onTapGesture { selectedSuitIndex = currentIndex }
+				.accessibilityIdentifier("ThumbnailView_Icon_\(currentSuit.rawValue)")
+				.accessibilityAddTraits(.isButton)
+				.accessibilityLabel("\(currentSuit.title) suit")
     }
 }

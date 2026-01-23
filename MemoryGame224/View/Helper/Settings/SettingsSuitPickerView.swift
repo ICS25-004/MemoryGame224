@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SuitSettingsPickerView: View {
+struct SettingsSuitPickerView: View {
 	@Binding var suits: [Suit]
 	@Binding var selectedSuitIndex: Int
 	
@@ -19,14 +19,15 @@ struct SuitSettingsPickerView: View {
 			Spacer()
 			
 			HStack(spacing: 12) {
-				ForEach(suits.indices) {
-					TabThumbnailView(
-						currentIndex: $0,
-						currentSuit: suits[$0],
+				ForEach(suits.indices, id: \.self) { index in
+					SettingsTabThumbnailView(
+						currentIndex: index,
+						currentSuit: suits[index],
 						selectedSuitIndex: $selectedSuitIndex
 					)
 				}
 			}
+			.accessibilityElement(children: .contain)
 			.accessibilityIdentifier("SuitSettingsPickerView_ThumbnailScrollView")
 			
 			Spacer()

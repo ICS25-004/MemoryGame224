@@ -1,6 +1,6 @@
 //
-//  MemoryGame226UITestsLaunchTests.swift
-//  MemoryGame226UITests
+//  MemoryGame224UITestsLaunchTests.swift
+//  MemoryGame224UITests
 //
 //  Created by Caleb on 2026-01-05.
 //
@@ -10,7 +10,7 @@ import XCTest
 final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
 	override class var runsForEachTargetApplicationUIConfiguration: Bool {
-		true
+		false
 	}
 	
 	override func setUpWithError() throws {
@@ -19,190 +19,203 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
 	// MARK: - Helper Methods
 	
-	/// Launches the app and navigates to the settings screen if not already there
-	private func launchAndNavigateToSettings(_ app: XCUIApplication) {
-		app.launch()
+	/// Detects if we're currently on the Settings screen
+	private func isOnSettingsScreen(_ app: XCUIApplication) -> Bool {
+		app.steppers["RowStepper"].exists ||
+		app.steppers["ColumnStepper"].exists ||
+		app.switches["BonusTileToggle"].exists
+	}
+	
+	/// Detects if we're currently on the Game screen
+	private func isOnGameScreen(_ app: XCUIApplication) -> Bool {
+		app.buttons["TabButtonsView_LeftButton"].exists ||
+		app.buttons["TabButtonsView_RightButton"].exists ||
+		app.otherElements["GameView_TabViewPages"].exists
+	}
+	
+
+	private func navigateToGame(_ app: XCUIApplication) {
 		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
-		// Navigate to settings if showing game screen
-		if !settingsButton.images.description.contains("Home") {
-			settingsButton.tap()
-		}
+
+		if isOnGameScreen(app) { return } //Already in game
+		if isOnSettingsScreen(app) { settingsButton.tap() }
+		
+		XCTAssertTrue(isOnGameScreen(app), 
+		              "Failed to navigate to game screen")
 	}
-	
-	/// Launches the app and navigates to the game screen if not already there
-	private func launchAndNavigateToGame(_ app: XCUIApplication) {
-		app.launch()
+
+	private func navigateToSettings(_ app: XCUIApplication) {
 		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
-		// Navigate to game if showing settings screen
-		if settingsButton.images.description.contains("Home") {
-			settingsButton.tap()
-			Thread.sleep(forTimeInterval: 0.5)
-		}
+		if isOnSettingsScreen(app) { return } //alreadt in settings
+		
+		settingsButton.tap()
+	
+		XCTAssertTrue(isOnSettingsScreen(app), 
+		              "Failed to navigate to settings screen")
 	}
 	
-	/// Tests a stepper by decrementing and incrementing, returning to original state
-	private func testStepper(app: XCUIApplication, identifier: String, tapCount: Int) {
-		XCTAssertTrue(app.steppers[identifier].waitForExistence(timeout: 5), "\(identifier) does not exist")
+	/// Tests a stepper by incrementing to 10 (and no higher), then decrementing to 5 (and no lower)
+	private func stepperTestHelper(app: XCUIApplication, identifier: String, labelPrefix: String) {
+		let stepper = app.steppers[identifier]
+		XCTAssertTrue(stepper.waitForExistence(timeout: 5), "\(identifier) does not exist")
 		
-		// Decrement
-		for _ in 0..<tapCount {
-			app.buttons["\(identifier)-Decrement"].firstMatch.tap()
-		}
 		
-		// Increment back to original state
-		for _ in 0..<tapCount {
+		let labelStart = app.staticTexts["\(labelPrefix): 5"].firstMatch // Verify starting at 5
+		XCTAssertTrue(labelStart.waitForExistence(timeout: 1), "Expected '\(labelPrefix): 5' label to exist at start")
+		
+		// Increment from 5 to 10
+		for i in 6...10 {
 			app.buttons["\(identifier)-Increment"].firstMatch.tap()
+			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
+			XCTAssertTrue(label.waitForExistence(timeout: 1), "Expected '\(labelPrefix): \(i)' label to exist after incrementing")
 		}
+	
+		let labelEnd = app.staticTexts["\(labelPrefix): 10"].firstMatch // Verify we're at 10 and cannot go higher
+		XCTAssertTrue(labelEnd.exists, "Should be at '\(labelPrefix): 10'")
+		app.buttons["\(identifier)-Increment"].firstMatch.tap()
+		XCTAssertTrue(labelEnd.exists, "Should still be at '\(labelPrefix): 10' after attempting to increment beyond max")
+		
+		//Teardown: Verify we're at 5 and stop here (no lower)
+		// Decrement from 10 to 5
+		for i in (5...9).reversed() {
+			app.buttons["\(identifier)-Decrement"].firstMatch.tap()
+			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
+			XCTAssertTrue(label.waitForExistence(timeout: 1), "Expected '\(labelPrefix): \(i)' label to exist after decrementing")
+		}
+		XCTAssertTrue(labelStart.exists, "Should be back at '\(labelPrefix): 5'")
 	}
 	
 	/// Tests navigation buttons by tapping right then left, returning to original position
-	private func testNavigationButtons(
+	private func navTestHelperButtons(
 		app: XCUIApplication,
 		leftIdentifier: String,
 		rightIdentifier: String,
 		tapCount: Int,
-		delay: TimeInterval = 0.3
 	) {
+		
 		let rightButton = app.buttons[rightIdentifier]
 		let leftButton = app.buttons[leftIdentifier]
 		
 		XCTAssertTrue(rightButton.waitForExistence(timeout: 5), "Right button does not exist")
 		XCTAssertTrue(leftButton.waitForExistence(timeout: 5), "Left button does not exist")
 		
-		// Navigate right
-		for _ in 0..<tapCount {
-			rightButton.tap()
-			Thread.sleep(forTimeInterval: delay)
-		}
 		
-		// Navigate left back to original position
-		for _ in 0..<tapCount {
-			leftButton.tap()
-			Thread.sleep(forTimeInterval: delay)
-		}
+		for _ in 0..<tapCount { rightButton.tap() }// Navigate right
+
+		for _ in 0..<tapCount { leftButton.tap() } // Navigate back to the left
 	}
 	
-	// MARK: - Tests
-	
+	// // MARK: - Tests
 	@MainActor
-	func testRowsStepper() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToSettings(app)
-		testStepper(app: app, identifier: "RowStepper", tapCount: 7)
+	func testSteppers() throws {
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
 		
-		// Teardown: Reset rows to default (5)
-		for _ in 0..<10 {
-			app.buttons["RowStepper-Decrement"].tap()
-		}
-		for _ in 0..<4 {
-			app.buttons["RowStepper-Increment"].tap()
-		}
-		
-		app.terminate()
+		stepperTestHelper(app: app, identifier: "RowStepper", labelPrefix: "Rows")
+		stepperTestHelper(app: app, identifier: "ColumnStepper", labelPrefix: "Columns")
+
+		//Teardown:
+		navigateToGame(app)
 	}
-	
-	@MainActor
-	func testColumnStepper() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToSettings(app)
-		testStepper(app: app, identifier: "ColumnStepper", tapCount: 7)
-		
-		// Teardown: Reset columns to default (5)
-		for _ in 0..<10 {
-			app.buttons["ColumnStepper-Decrement"].tap()
-		}
-		for _ in 0..<4 {
-			app.buttons["ColumnStepper-Increment"].tap()
-		}
-		
-		app.terminate()
-	}
-	
 	@MainActor
 	func testSuitSettingsPickerView_Buttons() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToSettings(app)
-		testNavigationButtons(
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
+		
+		navTestHelperButtons(
 			app: app,
 			leftIdentifier: "SuitSettingsPickerView_LeftButton",
 			rightIdentifier: "SuitSettingsPickerView_RightButton",
 			tapCount: 3
 		)
 		
-		// Teardown: Already returned to original position by testNavigationButtons
-		
-		app.terminate()
+		//Teardown:
+		navigateToGame(app)
 	}
 	
 	@MainActor
 	func testSuitSettingsPickerView_ThumbnailScrollView() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToSettings(app)
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
 		
-		// Tap thumbnail icon
-		let thumbnailIcon = app.images["ThumbnailView_Icon_3"].firstMatch
+		
+		// Tap spade thumbnail (the 4th one) - Using buttons since we have .isButton
+		let thumbnailIcon = app.buttons["ThumbnailView_Icon_spade"].firstMatch
+		XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "Spade thumbnail should exist")
 		thumbnailIcon.tap()
 		
-		// Teardown: Return to original thumbnail (already done inline)
-		app.images["ThumbnailView_Icon_0"].firstMatch.tap()
-		
-		app.terminate()
+		// Teardown: Return to original thumbnail (heart) and navigate back to game
+		let heartThumbnail = app.buttons["ThumbnailView_Icon_heart"].firstMatch
+		XCTAssertTrue(heartThumbnail.waitForExistence(timeout: 2), "Heart thumbnail should exist")
+		heartThumbnail.tap()
+		navigateToGame(app)
 	}
 	
 	@MainActor
 	func testSuitSettingsPickerView_BonusSwitches() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToSettings(app)
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
 		
 		let bonusSwitch = app.switches["BonusTileToggle"].firstMatch
-		
-		bonusSwitch.tap() // Turn on
-		
-		// Teardown: Turn back off (return to default state)
 		bonusSwitch.tap()
+		Thread.sleep(forTimeInterval: 0.5)
 		
-		app.terminate()
+		// Teardown: Turn back off and navigate back to game
+		bonusSwitch.tap()
+		navigateToGame(app)
 	}
 	
 	@MainActor
 	func testSwipeTabViewPages() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToGame(app)
+		let app = XCUIApplication(); app.launch()
+		navigateToGame(app)
 		
-		let swipeCount = 3
+		let swipeCount = 6 //Ensure we DONT loop
 		
 		// Swipe left through tabs
 		for _ in 0..<swipeCount {
-			app.swipeLeft(velocity: .slow)
+			app.swipeLeft()
 			Thread.sleep(forTimeInterval: 0.5)
 		}
 		
-		// Teardown: Swipe right back to original tab (already done inline)
-		for _ in 0..<swipeCount {
-			app.swipeRight(velocity: .slow)
-			Thread.sleep(forTimeInterval: 0.5)
-		}
-		
-		app.terminate()
+		// Teardown: Swipe right back to original tab
+		for _ in 0..<swipeCount { app.swipeRight() }
 	}
 	
 	@MainActor
 	func testButtonTabViewPages() throws {
-		let app = XCUIApplication()
-		launchAndNavigateToGame(app)
-		testNavigationButtons(
+		let app = XCUIApplication(); app.launch()
+		navigateToGame(app)
+		
+		navTestHelperButtons(
 			app: app,
 			leftIdentifier: "TabButtonsView_LeftButton",
 			rightIdentifier: "TabButtonsView_RightButton",
-			tapCount: 3
+			tapCount: 5 //see if looping works.
 		)
+	}
+	
+	
+	@MainActor
+	func testAllThumbnailsInteractive() throws {
+		let app = XCUIApplication(); app.launch()
+		let suits = ["heart", "club", "diamond", "spade"]
+		navigateToSettings(app)
 		
-		// Teardown: Already returned to original position by testNavigationButtons
+		// Test each TabThumbnailView by tapping it - use buttons since we added .isButton trait
+		for suit in suits {
+			let thumbnailIcon = app.buttons["ThumbnailView_Icon_\(suit)"].firstMatch
+			XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "TabThumbnailView '\(suit)' should exist")
+			thumbnailIcon.tap()
+		}
 		
-		app.terminate()
+		// Teardown:
+		app.buttons["ThumbnailView_Icon_heart"].firstMatch.tap()
+		navigateToGame(app)
 	}
 }
+

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2485BC872F2417960068996D /* MemoryGame224Tests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2485BC862F2417960068996D /* MemoryGame224Tests.xctestplan */; };
+		2485BC882F2417A60068996D /* MemoryGame224Tests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2485BC862F2417960068996D /* MemoryGame224Tests.xctestplan */; };
 		24FF73092F20466600323A6D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 24FF73082F20466600323A6D /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +33,7 @@
 		245797B62F0C40000038AED1 /* MemoryGame224.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemoryGame224.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		245797C32F0C40010038AED1 /* MemoryGame224Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MemoryGame224Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		245797CD2F0C40010038AED1 /* MemoryGame224UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MemoryGame224UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2467BE382F1EFE6600F33262 /* MemoryGame224.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MemoryGame224.xctestplan; sourceTree = "<group>"; };
+		2485BC862F2417960068996D /* MemoryGame224Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MemoryGame224Tests.xctestplan; sourceTree = "<group>"; };
 		24FF73082F20466600323A6D /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,9 +51,9 @@
 				Model/CardModel.swift,
 				View/Cards/SuitCardView.swift,
 				View/ContentView.swift,
-				View/Helper/SuitSettingsPickerView.swift,
-				View/Helper/TabButtonsView.swift,
-				View/Helper/TabThumbnailView.swift,
+				View/Helper/Game/GameTabButtonsView.swift,
+				View/Helper/Settings/SettingsSuitPickerView.swift,
+				View/Helper/Settings/SettingsTabThumbnailView.swift,
 				View/Pages/GameView.swift,
 				View/Pages/SettingsView.swift,
 			);
@@ -109,7 +111,7 @@
 		245797AD2F0C40000038AED1 = {
 			isa = PBXGroup;
 			children = (
-				2467BE382F1EFE6600F33262 /* MemoryGame224.xctestplan */,
+				2485BC862F2417960068996D /* MemoryGame224Tests.xctestplan */,
 				245797B82F0C40000038AED1 /* MemoryGame224 */,
 				24A329C72F1002B00008C926 /* Tests */,
 				245797B72F0C40000038AED1 /* Products */,
@@ -257,6 +259,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24FF73092F20466600323A6D /* AppIcon.icon in Resources */,
+				2485BC872F2417960068996D /* MemoryGame224Tests.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +274,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2485BC882F2417A60068996D /* MemoryGame224Tests.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
