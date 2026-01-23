@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SuitPickerView: View {
+struct SuitSettingsPickerView: View {
 	@Binding var suits: [Suit]
 	@Binding var selectedSuitIndex: Int
 	

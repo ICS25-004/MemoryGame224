@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ThumbnailView: View {
+struct TabThumbnailView: View {
 	@State var currentIndex: Int
 	@State var currentSuit: Suit
 	
@@ -24,6 +24,10 @@ struct ThumbnailView: View {
 								.stroke(currentIndex == selectedSuitIndex
 												? currentSuit.color
 												: Color.clear, lineWidth: 2)
+						)
+						.background(
+							RoundedRectangle(cornerRadius: 8)
+								.fill(Color.white)
 						)
 						.accessibilityIdentifier("ThumbnailView_Icon_\(currentIndex)")
 						.onTapGesture { selectedSuitIndex = currentIndex }
