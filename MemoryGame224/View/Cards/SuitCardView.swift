@@ -22,6 +22,7 @@ struct SuitCardView: View {
 					.frame(width: 100)
 					.foregroundStyle(suit.color)
 					.padding(.bottom, 25)
+					.accessibilityIdentifier("SuitCardView_Image_\(suit.rawValue)")
 			}
 			.padding(.top, 30)
 			.padding(.horizontal, 20)

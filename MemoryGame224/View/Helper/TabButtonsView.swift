@@ -8,7 +8,12 @@ struct TabButtonsView: View {
 		var body: some View {
 				HStack {
 						Button {
-								selection = max(selection - 1, lowerBound)
+								// Wrap around: if at first item, go to last
+								if selection == lowerBound {
+										selection = upperBound
+								} else {
+										selection = selection - 1
+								}
 						} label: {
 								Image(systemName: "chevron.left")
 										.font(.title2.bold())
@@ -16,13 +21,16 @@ struct TabButtonsView: View {
 										.background(.ultraThinMaterial, in: Circle())
 						}
 						.accessibilityIdentifier("TabButtonsView_LeftButton")
-						.disabled(selection == lowerBound)
-						.opacity(selection == lowerBound ? 0.5 : 1)
 
 						Spacer()
 
 						Button {
-								selection = min(selection + 1, upperBound)
+								// Wrap around: if at last item, go to first
+								if selection == upperBound {
+										selection = lowerBound
+								} else {
+										selection = selection + 1
+								}
 						} label: {
 								Image(systemName: "chevron.right")
 										.font(.title2.bold())
@@ -30,8 +38,6 @@ struct TabButtonsView: View {
 										.background(.ultraThinMaterial, in: Circle())
 						}
 						.accessibilityIdentifier("TabButtonsView_RightButton")
-						.disabled(selection == upperBound)
-						.opacity(selection == upperBound ? 0.5 : 1)
 				}
 		}
 }
