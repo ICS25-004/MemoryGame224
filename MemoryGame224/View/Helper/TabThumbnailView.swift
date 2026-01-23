@@ -21,9 +21,7 @@ struct TabThumbnailView: View {
 						.foregroundStyle(currentSuit.color)
 						.overlay(
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(currentIndex == selectedSuitIndex
-												? currentSuit.color
-												: Color.clear, lineWidth: 2)
+								.stroke(currentIndex == selectedSuitIndex ? currentSuit.color : Color.clear, lineWidth: 2)
 						)
 						.background(
 							RoundedRectangle(cornerRadius: 8)

@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-enum Suit: String, CaseIterable, Identifiable, Equatable {
+enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
 	var id: String { rawValue }
 	
 	case heart, club, diamond, spade

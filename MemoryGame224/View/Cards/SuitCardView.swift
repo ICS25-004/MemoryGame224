@@ -20,7 +20,7 @@ struct SuitCardView: View {
 					.resizable()
 					.scaledToFit()
 					.frame(width: 100)
-					.foregroundColor(suit.color)
+					.foregroundStyle(suit.color)
 					.padding(.bottom, 25)
 			}
 			.padding(.top, 30)

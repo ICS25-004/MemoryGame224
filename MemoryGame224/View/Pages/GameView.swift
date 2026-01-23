@@ -15,6 +15,7 @@ struct GameView: View {
 							}
 					}
 					.tabViewStyle(.page(indexDisplayMode: .always))
+					.accessibilityIdentifier("GameView_TabViewPages")
 					.ignoresSafeArea()
 
 					TabButtonsView(selection: $selectedSuitIndex, lowerBound: 0, upperBound: suits.count - 1)
