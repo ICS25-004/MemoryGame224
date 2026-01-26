@@ -33,19 +33,19 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		app.otherElements["GameView_TabViewPages"].exists
 	}
 	
-
+	
 	private func navigateToGame(_ app: XCUIApplication) {
 		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
-
+		
 		if isOnGameScreen(app) { return } //Already in game
 		if isOnSettingsScreen(app) { settingsButton.tap() }
 		
-		XCTAssertTrue(isOnGameScreen(app), 
-		              "Failed to navigate to game screen")
+		XCTAssertTrue(isOnGameScreen(app),
+									"Failed to navigate to game screen")
 	}
-
+	
 	private func navigateToSettings(_ app: XCUIApplication) {
 		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
@@ -53,9 +53,9 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		if isOnSettingsScreen(app) { return } //alreadt in settings
 		
 		settingsButton.tap()
-	
-		XCTAssertTrue(isOnSettingsScreen(app), 
-		              "Failed to navigate to settings screen")
+		
+		XCTAssertTrue(isOnSettingsScreen(app),
+									"Failed to navigate to settings screen")
 	}
 	
 	/// Tests a stepper by incrementing to 10 (and no higher), then decrementing to 5 (and no lower)
@@ -67,21 +67,20 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let labelStart = app.staticTexts["\(labelPrefix): 5"].firstMatch // Verify starting at 5
 		XCTAssertTrue(labelStart.waitForExistence(timeout: 1), "Expected '\(labelPrefix): 5' label to exist at start")
 		
-		// Increment from 5 to 10
-		for i in 6...10 {
+		// Increment from 5 (excluded) to 10
+		for i in (5...10).dropFirst() {
 			app.buttons["\(identifier)-Increment"].firstMatch.tap()
 			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
 			XCTAssertTrue(label.waitForExistence(timeout: 1), "Expected '\(labelPrefix): \(i)' label to exist after incrementing")
 		}
-	
+		
 		let labelEnd = app.staticTexts["\(labelPrefix): 10"].firstMatch // Verify we're at 10 and cannot go higher
 		XCTAssertTrue(labelEnd.exists, "Should be at '\(labelPrefix): 10'")
 		app.buttons["\(identifier)-Increment"].firstMatch.tap()
 		XCTAssertTrue(labelEnd.exists, "Should still be at '\(labelPrefix): 10' after attempting to increment beyond max")
 		
-		//Teardown: Verify we're at 5 and stop here (no lower)
-		// Decrement from 10 to 5
-		for i in (5...9).reversed() {
+		// Teardown: Decrement from 10 to 5 (checking each value after decrementing)
+		for i in (5...10).dropLast().reversed() {
 			app.buttons["\(identifier)-Decrement"].firstMatch.tap()
 			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
 			XCTAssertTrue(label.waitForExistence(timeout: 1), "Expected '\(labelPrefix): \(i)' label to exist after decrementing")
@@ -105,7 +104,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		
 		
 		for _ in 0..<tapCount { rightButton.tap() }// Navigate right
-
+		
 		for _ in 0..<tapCount { leftButton.tap() } // Navigate back to the left
 	}
 	
@@ -117,7 +116,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		
 		stepperTestHelper(app: app, identifier: "RowStepper", labelPrefix: "Rows")
 		stepperTestHelper(app: app, identifier: "ColumnStepper", labelPrefix: "Columns")
-
+		
 		//Teardown:
 		navigateToGame(app)
 	}
@@ -206,16 +205,19 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let suits = ["heart", "club", "diamond", "spade"]
 		navigateToSettings(app)
 		
-		// Test each TabThumbnailView by tapping it - use buttons since we added .isButton trait
+		let thumbnailScrollView = app.otherElements["SuitSettingsPickerView_ThumbnailScrollView"]
+		XCTAssertTrue(thumbnailScrollView.waitForExistence(timeout: 3), "Thumbnail scroll view should exist")
+		
+		// Test each TabThumbnailView by tapping. Via added .isButton trait
 		for suit in suits {
 			let thumbnailIcon = app.buttons["ThumbnailView_Icon_\(suit)"].firstMatch
 			XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "TabThumbnailView '\(suit)' should exist")
-			thumbnailIcon.tap()
+			thumbnailIcon.tap(); Thread.sleep(forTimeInterval: 0.3) //Slight delay between taps
 		}
 		
 		// Teardown:
 		app.buttons["ThumbnailView_Icon_heart"].firstMatch.tap()
 		navigateToGame(app)
 	}
+	
 }
-

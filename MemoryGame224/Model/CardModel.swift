@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+
 enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
 	var id: String { rawValue }
 	
@@ -13,8 +14,10 @@ enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
 	
 	var color : Color {
 		switch self {
-		case .heart, .diamond: return .red
-		case .club, .spade: return .black
+		case .heart, .diamond:
+			return .red
+		case .club, .spade:
+			return .black
 		}
 	}
 	

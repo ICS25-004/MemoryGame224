@@ -14,13 +14,13 @@ struct GameView: View {
 								SuitCardView(suit: $suits[index])
 							}
 					}
-					.tabViewStyle(.page(indexDisplayMode: .always))
+					.tabViewStyle(.page(indexDisplayMode: .always)) //Each swipe tab gets own page
+					.ignoresSafeArea() //Expand safe area of view
 					.accessibilityIdentifier("GameView_TabViewPages")
-					.ignoresSafeArea()
+					
 
 					GameTabButtonsView(selection: $selectedSuitIndex, lowerBound: 0, upperBound: suits.count - 1)
-							.padding(.horizontal, 24)
-							.padding(.vertical, 50)
+							.padding(.horizontal, 10)
 							.ignoresSafeArea(edges: .bottom)
 			}
 		}

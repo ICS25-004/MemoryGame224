@@ -21,7 +21,7 @@ struct GameTabButtonsView: View {
 										.background(.ultraThinMaterial, in: Circle())
 						}
 						.accessibilityIdentifier("TabButtonsView_LeftButton")
-
+					
 						Spacer()
 
 						Button {

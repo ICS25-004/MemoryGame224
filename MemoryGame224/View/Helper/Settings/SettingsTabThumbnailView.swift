@@ -14,23 +14,27 @@ struct SettingsTabThumbnailView: View {
 	@Binding var selectedSuitIndex: Int
 
     var body: some View {
+			Button(action: {
+				selectedSuitIndex = currentIndex
+			}) {
 				VStack(spacing: 4) {
 					Image(systemName: currentSuit.iconName)
 						.frame(width: 44, height: 44)
 						.foregroundStyle(currentSuit.color)
 						.overlay(
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(currentIndex == selectedSuitIndex ? currentSuit.color : Color.clear, lineWidth: 2)
+								.stroke(
+									currentIndex == selectedSuitIndex ? Color.accentColor : Color.clear, lineWidth: 2
+								)
 						)
 						.background(
 							RoundedRectangle(cornerRadius: 8)
 								.fill(Color.white)
 						)
 				}
-				.contentShape(Rectangle())
-				.onTapGesture { selectedSuitIndex = currentIndex }
-				.accessibilityIdentifier("ThumbnailView_Icon_\(currentSuit.rawValue)")
-				.accessibilityAddTraits(.isButton)
-				.accessibilityLabel("\(currentSuit.title) suit")
+			}
+			.buttonStyle(.plain)
+			.accessibilityAddTraits(.isButton)
+			.accessibilityIdentifier("ThumbnailView_Icon_\(currentSuit.rawValue)")
     }
 }

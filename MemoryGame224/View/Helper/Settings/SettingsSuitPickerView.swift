@@ -4,7 +4,7 @@ struct SettingsSuitPickerView: View {
 	@Binding var suits: [Suit]
 	@Binding var selectedSuitIndex: Int
 	
-
+	
 	var body: some View {
 		HStack(spacing: 0) {
 			Button(action: {
@@ -12,13 +12,18 @@ struct SettingsSuitPickerView: View {
 			})
 			{
 				Image(systemName: "chevron.left")
+					.padding(15)
 			}
+			.glassEffect(.regular.tint(.orange).interactive(), in: Circle())
+			.disabled(
+				selectedSuitIndex == 0
+			)
 			.accessibilityIdentifier("SuitSettingsPickerView_LeftButton")
-			.disabled(selectedSuitIndex == 0)
 			
 			Spacer()
 			
-			HStack(spacing: 12) {
+			
+			HStack(spacing: 10) {
 				ForEach(suits.indices, id: \.self) { index in
 					SettingsTabThumbnailView(
 						currentIndex: index,
@@ -27,20 +32,25 @@ struct SettingsSuitPickerView: View {
 					)
 				}
 			}
-			.accessibilityElement(children: .contain)
+			.accessibilityElement(children: .contain) //Issues without this, expliclty identify hstack to test all thumbnails
 			.accessibilityIdentifier("SuitSettingsPickerView_ThumbnailScrollView")
 			
 			Spacer()
 			
-			Button(action: {
-				if selectedSuitIndex < suits.count - 1 { selectedSuitIndex += 1 }
-			})
-			{
-				Image(systemName: "chevron.right")
-			}
-			.accessibilityIdentifier("SuitSettingsPickerView_RightButton")
-			.disabled(selectedSuitIndex >= max(suits.count - 1, 0))
+			Button(
+				action: {
+					if selectedSuitIndex < suits.count - 1 { selectedSuitIndex += 1 }
+				}, label: {
+					Image(systemName: "chevron.right")
+						.padding(15)
+				}
+			)
 			
+			.glassEffect(.regular.tint(.orange).interactive(), in: Circle())
+			.disabled(
+				selectedSuitIndex >= max(suits.count - 1, 0)
+			)
+			.accessibilityIdentifier("SuitSettingsPickerView_RightButton")
 		}
 		.padding(.horizontal)
 		.padding(.top, 24)
