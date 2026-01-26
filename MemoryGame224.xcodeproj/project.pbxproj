@@ -49,7 +49,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Model/CardModel.swift,
-				View/Cards/SuitCardView.swift,
+				View/Card/SuitCardView.swift,
 				View/ContentView.swift,
 				View/Helper/Game/GameTabButtonsView.swift,
 				View/Helper/Settings/SettingsSuitPickerView.swift,

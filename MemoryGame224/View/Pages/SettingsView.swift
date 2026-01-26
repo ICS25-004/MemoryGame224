@@ -15,11 +15,9 @@ struct SettingsView: View {
 	@Binding var selectedSuitIndex: Int
 	@Binding var suits : [Suit]
 
-	//Get the max (make sure not to go out of bounds zero)
-	//Get the min (make sure not to go out of bounds count - 1)
-	private var selectedSuit: Suit {
-		suits[min(max(selectedSuitIndex, 0), suits.count - 1)]
-	}
+	//1. Get the max (make sure not to go out of bounds zero)
+	//2. Get the min (make sure not to go out of bounds count - 1)
+	private var selectedSuit: Suit { suits[min(max(selectedSuitIndex, 0), suits.count - 1)] }
 	
 	var body: some View {
 		VStack(spacing: 20) {

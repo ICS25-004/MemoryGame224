@@ -9,16 +9,12 @@ import XCTest
 
 final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
-	override class var runsForEachTargetApplicationUIConfiguration: Bool {
-		false
-	}
+	//Both dark mode and light mode
+	override class var runsForEachTargetApplicationUIConfiguration: Bool { true }
 	
-	override func setUpWithError() throws {
-		continueAfterFailure = false
-	}
+	override func setUpWithError() throws { continueAfterFailure = false }
 	
 	// MARK: - Helper Methods
-	
 	/// Detects if we're currently on the Settings screen
 	private func isOnSettingsScreen(_ app: XCUIApplication) -> Bool {
 		app.steppers["RowStepper"].exists ||
@@ -78,6 +74,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		XCTAssertTrue(labelEnd.exists, "Should be at '\(labelPrefix): 10'")
 		app.buttons["\(identifier)-Increment"].firstMatch.tap()
 		XCTAssertTrue(labelEnd.exists, "Should still be at '\(labelPrefix): 10' after attempting to increment beyond max")
+		
 		
 		// Teardown: Decrement from 10 to 5 (checking each value after decrementing)
 		for i in (5...10).dropLast().reversed() {
