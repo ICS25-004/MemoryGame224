@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SettingsSuitPickerView: View {
+struct SettingsImagePickerFull: View {
 	@Binding var suits: [Suit]
 	@Binding var selectedSuitIndex: Int
 	
@@ -25,7 +25,7 @@ struct SettingsSuitPickerView: View {
 			
 			HStack(spacing: 10) {
 				ForEach(suits.indices, id: \.self) { index in
-					SettingsTabThumbnailView(
+					ImagePickerView(
 						currentIndex: index,
 						currentSuit: suits[index],
 						selectedSuitIndex: $selectedSuitIndex

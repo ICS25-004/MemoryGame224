@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-struct SettingsTabThumbnailView: View {
+struct ImagePickerView: View {
 	let currentIndex: Int
 	let currentSuit: Suit
-	
 	@Binding var selectedSuitIndex: Int
 
     var body: some View {
@@ -33,7 +32,6 @@ struct SettingsTabThumbnailView: View {
 						)
 				}
 			}
-			.buttonStyle(.plain)
 			.accessibilityAddTraits(.isButton)
 			.accessibilityIdentifier("ThumbnailView_Icon_\(currentSuit.rawValue)")
     }

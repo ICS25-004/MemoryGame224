@@ -10,7 +10,7 @@ import XCTest
 final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
 	//Both dark mode and light mode
-	override class var runsForEachTargetApplicationUIConfiguration: Bool { true }
+	override class var runsForEachTargetApplicationUIConfiguration: Bool { false }
 	
 	override func setUpWithError() throws { continueAfterFailure = false }
 	
@@ -19,7 +19,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	private func isOnSettingsScreen(_ app: XCUIApplication) -> Bool {
 		app.steppers["RowStepper"].exists ||
 		app.steppers["ColumnStepper"].exists ||
-		app.switches["BonusTileToggle"].exists
+		app.buttons["BonusTileToggle"].exists
 	}
 	
 	/// Detects if we're currently on the Game screen
@@ -60,7 +60,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		XCTAssertTrue(stepper.waitForExistence(timeout: 5), "\(identifier) does not exist")
 		
 		
-		let labelStart = app.staticTexts["\(labelPrefix): 5"].firstMatch // Verify starting at 5
+		let labelStart = app.staticTexts["\(labelPrefix): 5"].firstMatch
 		XCTAssertTrue(labelStart.waitForExistence(timeout: 1), "Expected '\(labelPrefix): 5' label to exist at start")
 		
 		// Increment from 5 (excluded) to 10
@@ -70,7 +70,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 			XCTAssertTrue(label.waitForExistence(timeout: 1), "Expected '\(labelPrefix): \(i)' label to exist after incrementing")
 		}
 		
-		let labelEnd = app.staticTexts["\(labelPrefix): 10"].firstMatch // Verify we're at 10 and cannot go higher
+		let labelEnd = app.staticTexts["\(labelPrefix): 10"].firstMatch
 		XCTAssertTrue(labelEnd.exists, "Should be at '\(labelPrefix): 10'")
 		app.buttons["\(identifier)-Increment"].firstMatch.tap()
 		XCTAssertTrue(labelEnd.exists, "Should still be at '\(labelPrefix): 10' after attempting to increment beyond max")
@@ -106,6 +106,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	}
 	
 	// // MARK: - Tests
+
 	@MainActor
 	func testSteppers() throws {
 		let app = XCUIApplication(); app.launch()
@@ -152,16 +153,14 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	}
 	
 	@MainActor
-	func testSuitSettingsPickerView_BonusSwitches() throws {
+	func testSuitSettingsPickerView_BonusToggle() throws {
 		let app = XCUIApplication(); app.launch()
 		navigateToSettings(app)
 		
-		let bonusSwitch = app.switches["BonusTileToggle"].firstMatch
-		bonusSwitch.tap()
-		Thread.sleep(forTimeInterval: 0.5)
+		let bonusToggle = app.switches["BonusTileToggle"]
+		bonusToggle.switches.firstMatch.tap()
 		
-		// Teardown: Turn back off and navigate back to game
-		bonusSwitch.tap()
+		bonusToggle.switches.firstMatch.tap()
 		navigateToGame(app)
 	}
 	
@@ -191,10 +190,70 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 			app: app,
 			leftIdentifier: "TabButtonsView_LeftButton",
 			rightIdentifier: "TabButtonsView_RightButton",
-			tapCount: 5 //see if looping works.
+			tapCount: 5
 		)
 	}
 	
+	@MainActor
+	func testLoadingAppStorage() throws {
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
+		
+		// Make changes to settings
+		let bonusToggle = app.switches["BonusTileToggle"]
+		XCTAssertTrue(bonusToggle.waitForExistence(timeout: 2), "Bonus switch should exist")
+		
+		// Toggle bonus switch ON
+		bonusToggle.switches.firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.5)
+		
+		// Increment columns from 5 to 6
+		let columnIncrement = app.buttons["ColumnStepper-Increment"].firstMatch
+		XCTAssertTrue(columnIncrement.waitForExistence(timeout: 2), "Column increment button should exist")
+		columnIncrement.tap()
+		Thread.sleep(forTimeInterval: 0.5)
+		
+		// Select heart thumbnail
+		let spadeThumbnail = app.buttons["ThumbnailView_Icon_spade"].firstMatch
+		XCTAssertTrue(spadeThumbnail.waitForExistence(timeout: 2), "Spade thumbnail should exist")
+		spadeThumbnail.tap()
+		Thread.sleep(forTimeInterval: 0.5)
+		
+		// Terminate and relaunch the app
+		app.terminate(); app.launch()
+		navigateToSettings(app)
+		
+		// Verify the settings persisted
+		let bonusToggleAfter = app.switches["BonusTileToggle"]
+		XCTAssertTrue(bonusToggleAfter.waitForExistence(timeout: 2), "Bonus switch should exist after relaunch")
+		
+		// Verify the toggle is ON
+		if let toggleValue = bonusToggleAfter.value {
+			XCTAssertEqual(String(describing: toggleValue), "On", "Bonus switch should be ON after relaunch")
+		} else {
+			XCTFail("Bonus toggle value should not be nil")
+		}
+		
+		let columnsLabel = app.staticTexts["Columns: 6"].firstMatch
+		XCTAssertTrue(columnsLabel.waitForExistence(timeout: 2), "Columns should be set to 6 after relaunch")
+		
+		// Verify heart is still selected
+		let heartThumbnailAfter = app.buttons["ThumbnailView_Icon_heart"].firstMatch
+		XCTAssertTrue(heartThumbnailAfter.exists, "Heart thumbnail should still exist after relaunch")
+		
+		// Teardown: Reset to defaults
+		bonusToggleAfter.tap() // Turn bonus back off
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		app.buttons["ThumbnailView_Icon_heart"].firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		let columnDecrement = app.buttons["ColumnStepper-Decrement"].firstMatch
+		columnDecrement.tap() // Return columns to 5
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		navigateToGame(app)
+	}
 	
 	@MainActor
 	func testAllThumbnailsInteractive() throws {

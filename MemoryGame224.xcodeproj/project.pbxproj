@@ -41,20 +41,25 @@
 		24A329BF2F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224Tests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Model/CardModel.swift,
+				Model/Board.swift,
+				Model/Card.swift,
+				Model/Tile.swift,
 			);
 			target = 245797C22F0C40010038AED1 /* MemoryGame224Tests */;
 		};
 		24A329C02F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224UITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Model/CardModel.swift,
+				Model/Board.swift,
+				Model/Card.swift,
+				Model/Tile.swift,
 				View/Card/SuitCardView.swift,
 				View/ContentView.swift,
 				View/Helper/Game/GameTabButtonsView.swift,
-				View/Helper/Settings/SettingsSuitPickerView.swift,
-				View/Helper/Settings/SettingsTabThumbnailView.swift,
+				View/Helper/Settings/ImagePickerView.swift,
+				View/Helper/Settings/SettingsImagePickerFull.swift,
 				View/Pages/GameView.swift,
+				View/Pages/GameViewRetired.swift,
 				View/Pages/SettingsView.swift,
 			);
 			target = 245797CC2F0C40010038AED1 /* MemoryGame224UITests */;

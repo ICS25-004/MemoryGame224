@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-	@AppStorage("rows") private var rows = 5
-	@AppStorage("columns") private var columns = 5
+	@AppStorage("rows") private var rowsAndColumns = 5
+	
 	@AppStorage("hasBonusTile") private var hasBonusTile: Bool = false
 		
 	@Binding var selectedSuitIndex: Int
@@ -34,25 +34,33 @@ struct SettingsView: View {
 				)
 				.padding(.bottom, 30)
 
-			SettingsSuitPickerView(suits: $suits, selectedSuitIndex: $selectedSuitIndex)
+			SettingsImagePickerFull(suits: $suits, selectedSuitIndex: $selectedSuitIndex)
 			Group {
-				Stepper(value: $rows, in: 1...10) {
-					Text("Rows: \( rows)")
+				Stepper(value: $rowsAndColumns, in: 1...10) {
+					Text("Rows & Columns: \(rowsAndColumns)")
 				}
-				.accessibilityIdentifier("RowStepper")
-				
-				Stepper(value:  $columns, in:   1...10) {
-					Text("Columns: \( columns)")
-				}
-				.accessibilityIdentifier("ColumnStepper")
+				.accessibilityIdentifier("rowsAndColumnsStepper")
 			}
-
+				
+			// Wrap Toggle in HStack to make it tappable as a button
 			HStack {
 				Image(systemName: "star.hexagon.fill")
-					.foregroundColor(.yellow)
-				Toggle("Bonus Tile", isOn: $hasBonusTile)
-					.accessibilityIdentifier("BonusTileToggle")
+					.foregroundStyle(.tint)
+				Text("Bonus Tile")
+				Spacer()
+				Toggle("", isOn: $hasBonusTile)
+					.labelsHidden()
 			}
+			.contentShape(Rectangle())
+			.onTapGesture {
+				hasBonusTile.toggle()
+			}
+			.accessibilityElement(children: .combine)
+			.accessibilityAddTraits(.isButton)
+			.accessibilityLabel("Bonus Tile")
+			.accessibilityValue(hasBonusTile ? "On" : "Off")
+			.accessibilityIdentifier("BonusTileToggle")
+
 		}
 		.padding()
 	}

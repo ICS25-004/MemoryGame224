@@ -22,12 +22,12 @@ struct ContentView: View {
 					)
 				}
 			}
-			.navigationTitle(showingSettings ? "Settings" : "Game")
 			.toolbar {
 				Button(action: { showingSettings.toggle() }) {
 					Image(systemName: showingSettings ? "house.fill" : "gearshape.fill")
 						.accessibilityIdentifier("ContentView_ToggleSettingsButtonIcon")
 				}
+				.buttonStyle(.glassProminent)
 				.accessibilityIdentifier("ContentView_ToggleSettingsButton")
 			}
 		}
