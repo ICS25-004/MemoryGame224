@@ -30,12 +30,14 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                Button(action: { showingSettings.toggle() }) {
+                Button{
+                    showingSettings.toggle()
+                } label: {
                     Image(systemName: showingSettings ? "house.fill" : "gearshape.fill")
-                        .accessibilityIdentifier("RootView_ToggleSettingsButtonIcon")
+                        .accessibilityIdentifier("ContentView_ToggleSettingsButtonIcon")
                 }
                 .buttonStyle(.glassProminent)
-                .accessibilityIdentifier("RootView_ToggleSettingsButton")
+                .accessibilityIdentifier("ContentView_ToggleSettingsButton")
             }
         }
     }

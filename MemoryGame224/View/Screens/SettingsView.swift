@@ -29,6 +29,8 @@ struct SettingsView: View {
 	///
 	/// Safely accesses the suits array using the selected index, clamping to valid range.
 	private var selectedSuit: Suit { suits[min(max(selectedSuitIndex, 0), suits.count - 1)] }
+    
+
 	
 	var body: some View {
 		VStack(spacing: 20) {
@@ -57,10 +59,11 @@ struct SettingsView: View {
 			HStack {
 				Image(systemName: "star.hexagon.fill")
 					.foregroundStyle(.tint)
-				Text("Bonus Tile")
 				Spacer()
-				Toggle("", isOn: $hasBonusTile)
-					.labelsHidden()
+				Toggle(
+                    "Bonus Tile",
+                    systemImage: "star.hexagon.fill",                   isOn: $hasBonusTile)
+				
 			}
 			.contentShape(Rectangle())
 			.onTapGesture {

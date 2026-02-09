@@ -28,9 +28,9 @@ struct TileGridView: View {
                         Button {
                             onTileTap(tile)
                         } label: {
-                            Image(systemName: getTileImageName(for: tile))
+                            Image(systemName: getTileImageName(tile))
                                 .font(.largeTitle)
-                                .foregroundStyle(getTileColor(for: tile))
+                                .foregroundStyle(getTileColor(tile))
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
@@ -47,11 +47,12 @@ struct TileGridView: View {
     ///
     /// - Parameter tile: The tile to determine the icon for.
     /// - Returns: SF Symbol name string (e.g., "suit.heart.fill" or "questionmark.app").
-    private func getTileImageName(for tile: Tile) -> String {
+    private func getTileImageName(_ tile: Tile) -> String {
         if treasuresVisible || tile.isRevealed {
-            return tile.contents
+             tile.contents
+        } else {
+            TileGridView.hiddenTileIcon
         }
-        return TileGridView.hiddenTileIcon
     }
     
     /// Determines the color to apply to a tile's icon.
@@ -61,10 +62,12 @@ struct TileGridView: View {
     ///
     /// - Parameter tile: The tile to determine the color for.
     /// - Returns: Color for the tile icon (suit color or primary).
-    private func getTileColor(for tile: Tile) -> Color {
-        if (treasuresVisible || tile.isRevealed) && tile.contents == selectedSuit.iconName {
-            return selectedSuit.color
+    private func getTileColor(_ tile: Tile) -> Color {
+        if (treasuresVisible || tile.isRevealed)
+            && tile.contents == selectedSuit.iconName {
+            selectedSuit.color
+        } else {
+            .primary
         }
-        return .primary
     }
 }

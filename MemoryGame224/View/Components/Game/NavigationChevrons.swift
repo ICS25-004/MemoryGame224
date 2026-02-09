@@ -14,14 +14,17 @@ struct NavigationChevrons: View {
     /// The maximum valid index (inclusive).
     let upperBound: Int
 
+    // Reusable wraparound navigation closures
+    private var increment: () -> Void { { selection = (selection == upperBound) ? lowerBound : selection + 1 } }
+
+    private var decrement: () -> Void { { selection = (selection == lowerBound) ? upperBound : selection - 1 } }
+    
+    
+    
     var body: some View {
         HStack {
             Button {
-                if selection == lowerBound {
-                    selection = upperBound
-                } else {
-                    selection = selection - 1
-                }
+                decrement()
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title2.bold())
@@ -33,11 +36,7 @@ struct NavigationChevrons: View {
             Spacer()
 
             Button {
-                if selection == upperBound {
-                    selection = lowerBound
-                } else {
-                    selection = selection + 1
-                }
+                increment()
             } label: {
                 Image(systemName: "chevron.right")
                     .font(.title2.bold())
@@ -48,3 +47,4 @@ struct NavigationChevrons: View {
         }
     }
 }
+

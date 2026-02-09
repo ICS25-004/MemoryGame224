@@ -28,7 +28,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
 	/// Navigates to the game screen
 	private func navigateToGame(_ app: XCUIApplication) {
-		let settingsButton = app.buttons["RootView_ToggleSettingsButton"]
+		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
 		if isOnGameScreen(app) { return }
@@ -39,7 +39,7 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
 	/// Navigates to the settings screen
 	private func navigateToSettings(_ app: XCUIApplication) {
-		let settingsButton = app.buttons["RootView_ToggleSettingsButton"]
+		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
 		if isOnSettingsScreen(app) { return }

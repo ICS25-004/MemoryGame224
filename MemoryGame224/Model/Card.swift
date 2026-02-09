@@ -28,21 +28,21 @@ enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
     /// - Returns: The system image name string for displaying the suit icon.
     var iconName: String {
         switch self {
-        case .heart: 
-						return "suit.heart.fill"
-        case .diamond: 
-						return "suit.diamond.fill"
-        case .club: 
-						return "suit.club.fill"
+        case .heart:
+            return "suit.heart.fill"
+        case .diamond:
+            return "suit.diamond.fill"
+        case .club:
+            return "suit.club.fill"
         case .spade: 
-						return "suit.spade.fill"
+            return "suit.spade.fill"
         }
     }
     
     /// The capitalized display name of the suit.
     ///
     /// - Returns: The suit name with the first letter capitalized (e.g., "Heart", "Club").
-    var title: String { 
+    var title: String {
         return self.rawValue.capitalized
     }
 }
