@@ -1,10 +1,3 @@
-//
-//  GameStatsFooter.swift
-//  MemoryGame224
-//
-//  Created by Caleb on 2026-02-09.
-//
-
 import SwiftUI
 
 /// Displays game statistics in a styled footer bar.

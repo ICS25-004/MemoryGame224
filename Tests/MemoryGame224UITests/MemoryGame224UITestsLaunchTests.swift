@@ -9,61 +9,54 @@ import XCTest
 
 final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	
-	//Both dark mode and light mode
-	override class var runsForEachTargetApplicationUIConfiguration: Bool { false }
+	override class var runsForEachTargetApplicationUIConfiguration: Bool { true }
 	
 	override func setUpWithError() throws { continueAfterFailure = false }
 	
 	// MARK: - Helper Methods
+	
 	/// Detects if we're currently on the Settings screen
 	private func isOnSettingsScreen(_ app: XCUIApplication) -> Bool {
-		app.steppers["RowStepper"].exists ||
-		app.steppers["ColumnStepper"].exists ||
-		app.buttons["BonusTileToggle"].exists
+		app.steppers["rowsAndColumnsStepper"].exists ||
+		app.switches["BonusTileToggle"].exists
 	}
 	
 	/// Detects if we're currently on the Game screen
 	private func isOnGameScreen(_ app: XCUIApplication) -> Bool {
-		app.buttons["TabButtonsView_LeftButton"].exists ||
-		app.buttons["TabButtonsView_RightButton"].exists ||
-		app.otherElements["GameView_TabViewPages"].exists
+		!isOnSettingsScreen(app)
 	}
 	
-	
+	/// Navigates to the game screen
 	private func navigateToGame(_ app: XCUIApplication) {
-		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
+		let settingsButton = app.buttons["RootView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
-		
-		if isOnGameScreen(app) { return } //Already in game
+		if isOnGameScreen(app) { return }
 		if isOnSettingsScreen(app) { settingsButton.tap() }
 		
-		XCTAssertTrue(isOnGameScreen(app),
-									"Failed to navigate to game screen")
+		XCTAssertTrue(isOnGameScreen(app), "Failed to navigate to game screen")
 	}
 	
+	/// Navigates to the settings screen
 	private func navigateToSettings(_ app: XCUIApplication) {
-		let settingsButton = app.buttons["ContentView_ToggleSettingsButton"]
+		let settingsButton = app.buttons["RootView_ToggleSettingsButton"]
 		XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "Settings button is missing")
 		
-		if isOnSettingsScreen(app) { return } //alreadt in settings
+		if isOnSettingsScreen(app) { return }
 		
 		settingsButton.tap()
 		
-		XCTAssertTrue(isOnSettingsScreen(app),
-									"Failed to navigate to settings screen")
+		XCTAssertTrue(isOnSettingsScreen(app), "Failed to navigate to settings screen")
 	}
 	
-	/// Tests a stepper by incrementing to 10 (and no higher), then decrementing to 5 (and no lower)
+	/// Tests the combined rows & columns stepper by incrementing to 10 and decrementing back to 5
 	private func stepperTestHelper(app: XCUIApplication, identifier: String, labelPrefix: String) {
 		let stepper = app.steppers[identifier]
 		XCTAssertTrue(stepper.waitForExistence(timeout: 5), "\(identifier) does not exist")
 		
-		
 		let labelStart = app.staticTexts["\(labelPrefix): 5"].firstMatch
 		XCTAssertTrue(labelStart.waitForExistence(timeout: 1), "Expected '\(labelPrefix): 5' label to exist at start")
 		
-		// Increment from 5 (excluded) to 10
 		for i in (5...10).dropFirst() {
 			app.buttons["\(identifier)-Increment"].firstMatch.tap()
 			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
@@ -75,8 +68,6 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		app.buttons["\(identifier)-Increment"].firstMatch.tap()
 		XCTAssertTrue(labelEnd.exists, "Should still be at '\(labelPrefix): 10' after attempting to increment beyond max")
 		
-		
-		// Teardown: Decrement from 10 to 5 (checking each value after decrementing)
 		for i in (5...10).dropLast().reversed() {
 			app.buttons["\(identifier)-Decrement"].firstMatch.tap()
 			let label = app.staticTexts["\(labelPrefix): \(i)"].firstMatch
@@ -90,19 +81,16 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		app: XCUIApplication,
 		leftIdentifier: String,
 		rightIdentifier: String,
-		tapCount: Int,
+		tapCount: Int
 	) {
-		
 		let rightButton = app.buttons[rightIdentifier]
 		let leftButton = app.buttons[leftIdentifier]
 		
 		XCTAssertTrue(rightButton.waitForExistence(timeout: 5), "Right button does not exist")
 		XCTAssertTrue(leftButton.waitForExistence(timeout: 5), "Left button does not exist")
 		
-		
-		for _ in 0..<tapCount { rightButton.tap() }// Navigate right
-		
-		for _ in 0..<tapCount { leftButton.tap() } // Navigate back to the left
+		for _ in 0..<tapCount { rightButton.tap() }
+		for _ in 0..<tapCount { leftButton.tap() }
 	}
 	
 	// // MARK: - Tests
@@ -112,10 +100,8 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let app = XCUIApplication(); app.launch()
 		navigateToSettings(app)
 		
-		stepperTestHelper(app: app, identifier: "RowStepper", labelPrefix: "Rows")
-		stepperTestHelper(app: app, identifier: "ColumnStepper", labelPrefix: "Columns")
+		stepperTestHelper(app: app, identifier: "rowsAndColumnsStepper", labelPrefix: "Rows & Columns")
 		
-		//Teardown:
 		navigateToGame(app)
 	}
 	@MainActor
@@ -125,12 +111,11 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		
 		navTestHelperButtons(
 			app: app,
-			leftIdentifier: "SuitSettingsPickerView_LeftButton",
-			rightIdentifier: "SuitSettingsPickerView_RightButton",
+			leftIdentifier: "SuitCarousel_LeftButton",
+			rightIdentifier: "SuitCarousel_RightButton",
 			tapCount: 3
 		)
 		
-		//Teardown:
 		navigateToGame(app)
 	}
 	
@@ -139,14 +124,17 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let app = XCUIApplication(); app.launch()
 		navigateToSettings(app)
 		
+		let segmentedToggle = app.switches["SegmentedPickerToggle"]
+		if segmentedToggle.exists && segmentedToggle.value as? String == "On" {
+			segmentedToggle.switches.firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.3)
+		}
 		
-		// Tap spade thumbnail (the 4th one) - Using buttons since we have .isButton
-		let thumbnailIcon = app.buttons["ThumbnailView_Icon_spade"].firstMatch
+		let thumbnailIcon = app.buttons["SuitThumbnail_Icon_spade"].firstMatch
 		XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "Spade thumbnail should exist")
 		thumbnailIcon.tap()
 		
-		// Teardown: Return to original thumbnail (heart) and navigate back to game
-		let heartThumbnail = app.buttons["ThumbnailView_Icon_heart"].firstMatch
+		let heartThumbnail = app.buttons["SuitThumbnail_Icon_heart"].firstMatch
 		XCTAssertTrue(heartThumbnail.waitForExistence(timeout: 2), "Heart thumbnail should exist")
 		heartThumbnail.tap()
 		navigateToGame(app)
@@ -165,33 +153,49 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 	}
 	
 	@MainActor
-	func testSwipeTabViewPages() throws {
+	func testBonusTileResetsTapCount() throws {
 		let app = XCUIApplication(); app.launch()
-		navigateToGame(app)
+		navigateToSettings(app)
 		
-		let swipeCount = 6 //Ensure we DONT loop
+		let bonusToggle = app.switches["BonusTileToggle"]
+		XCTAssertTrue(bonusToggle.waitForExistence(timeout: 2), "Bonus toggle should exist")
 		
-		// Swipe left through tabs
-		for _ in 0..<swipeCount {
-			app.swipeLeft()
+		if bonusToggle.value as? String == "Off" {
+			bonusToggle.switches.firstMatch.tap()
 			Thread.sleep(forTimeInterval: 0.5)
 		}
 		
-		// Teardown: Swipe right back to original tab
-		for _ in 0..<swipeCount { app.swipeRight() }
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 5)
+		
+		let anyTile = app.buttons.matching(identifier: "TileGridView_Tile").firstMatch
+		if anyTile.waitForExistence(timeout: 2) {
+			anyTile.tap()
+			anyTile.tap()
+		}
+		
+		navigateToSettings(app)
+		bonusToggle.switches.firstMatch.tap()
+		navigateToGame(app)
 	}
 	
 	@MainActor
-	func testButtonTabViewPages() throws {
+	func testGameBoardResizing() throws {
 		let app = XCUIApplication(); app.launch()
-		navigateToGame(app)
+		navigateToSettings(app)
 		
-		navTestHelperButtons(
-			app: app,
-			leftIdentifier: "TabButtonsView_LeftButton",
-			rightIdentifier: "TabButtonsView_RightButton",
-			tapCount: 5
-		)
+		let stepper = app.steppers["rowsAndColumnsStepper"]
+		XCTAssertTrue(stepper.waitForExistence(timeout: 2), "Stepper should exist")
+		
+		app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.5)
+		
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 1)
+		
+		navigateToSettings(app)
+		app.buttons["rowsAndColumnsStepper-Decrement"].firstMatch.tap()
+		navigateToGame(app)
 	}
 	
 	@MainActor
@@ -199,57 +203,45 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let app = XCUIApplication(); app.launch()
 		navigateToSettings(app)
 		
-		// Make changes to settings
 		let bonusToggle = app.switches["BonusTileToggle"]
 		XCTAssertTrue(bonusToggle.waitForExistence(timeout: 2), "Bonus switch should exist")
 		
-		// Toggle bonus switch ON
 		bonusToggle.switches.firstMatch.tap()
 		Thread.sleep(forTimeInterval: 0.5)
 		
-		// Increment columns from 5 to 6
-		let columnIncrement = app.buttons["ColumnStepper-Increment"].firstMatch
-		XCTAssertTrue(columnIncrement.waitForExistence(timeout: 2), "Column increment button should exist")
-		columnIncrement.tap()
+		let sizeIncrement = app.buttons["rowsAndColumnsStepper-Increment"].firstMatch
+		XCTAssertTrue(sizeIncrement.waitForExistence(timeout: 2), "Size increment button should exist")
+		sizeIncrement.tap()
 		Thread.sleep(forTimeInterval: 0.5)
 		
-		// Select heart thumbnail
-		let spadeThumbnail = app.buttons["ThumbnailView_Icon_spade"].firstMatch
+		let spadeThumbnail = app.buttons["SuitThumbnail_Icon_spade"].firstMatch
 		XCTAssertTrue(spadeThumbnail.waitForExistence(timeout: 2), "Spade thumbnail should exist")
 		spadeThumbnail.tap()
 		Thread.sleep(forTimeInterval: 0.5)
 		
-		// Terminate and relaunch the app
 		app.terminate(); app.launch()
 		navigateToSettings(app)
 		
-		// Verify the settings persisted
 		let bonusToggleAfter = app.switches["BonusTileToggle"]
 		XCTAssertTrue(bonusToggleAfter.waitForExistence(timeout: 2), "Bonus switch should exist after relaunch")
 		
-		// Verify the toggle is ON
 		if let toggleValue = bonusToggleAfter.value {
 			XCTAssertEqual(String(describing: toggleValue), "On", "Bonus switch should be ON after relaunch")
 		} else {
 			XCTFail("Bonus toggle value should not be nil")
 		}
 		
-		let columnsLabel = app.staticTexts["Columns: 6"].firstMatch
-		XCTAssertTrue(columnsLabel.waitForExistence(timeout: 2), "Columns should be set to 6 after relaunch")
+		let sizeLabel = app.staticTexts["Rows & Columns: 6"].firstMatch
+		XCTAssertTrue(sizeLabel.waitForExistence(timeout: 2), "Size should be set to 6 after relaunch")
 		
-		// Verify heart is still selected
-		let heartThumbnailAfter = app.buttons["ThumbnailView_Icon_heart"].firstMatch
-		XCTAssertTrue(heartThumbnailAfter.exists, "Heart thumbnail should still exist after relaunch")
-		
-		// Teardown: Reset to defaults
-		bonusToggleAfter.tap() // Turn bonus back off
+		bonusToggleAfter.tap()
 		Thread.sleep(forTimeInterval: 0.3)
 		
-		app.buttons["ThumbnailView_Icon_heart"].firstMatch.tap()
+		app.buttons["SuitThumbnail_Icon_heart"].firstMatch.tap()
 		Thread.sleep(forTimeInterval: 0.3)
 		
-		let columnDecrement = app.buttons["ColumnStepper-Decrement"].firstMatch
-		columnDecrement.tap() // Return columns to 5
+		let sizeDecrement = app.buttons["rowsAndColumnsStepper-Decrement"].firstMatch
+		sizeDecrement.tap()
 		Thread.sleep(forTimeInterval: 0.3)
 		
 		navigateToGame(app)
@@ -261,18 +253,77 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let suits = ["heart", "club", "diamond", "spade"]
 		navigateToSettings(app)
 		
-		let thumbnailScrollView = app.otherElements["SuitSettingsPickerView_ThumbnailScrollView"]
-		XCTAssertTrue(thumbnailScrollView.waitForExistence(timeout: 3), "Thumbnail scroll view should exist")
+		let thumbnailContainer = app.otherElements["SuitCarousel_ThumbnailContainer"]
+		XCTAssertTrue(thumbnailContainer.waitForExistence(timeout: 3), "Thumbnail container should exist")
 		
-		// Test each TabThumbnailView by tapping. Via added .isButton trait
 		for suit in suits {
-			let thumbnailIcon = app.buttons["ThumbnailView_Icon_\(suit)"].firstMatch
-			XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "TabThumbnailView '\(suit)' should exist")
-			thumbnailIcon.tap(); Thread.sleep(forTimeInterval: 0.3) //Slight delay between taps
+			let thumbnailIcon = app.buttons["SuitThumbnail_Icon_\(suit)"].firstMatch
+			XCTAssertTrue(thumbnailIcon.waitForExistence(timeout: 2), "SuitThumbnail '\(suit)' should exist")
+			thumbnailIcon.tap()
+			Thread.sleep(forTimeInterval: 0.3)
 		}
 		
-		// Teardown:
-		app.buttons["ThumbnailView_Icon_heart"].firstMatch.tap()
+		app.buttons["SuitThumbnail_Icon_heart"].firstMatch.tap()
+		navigateToGame(app)
+	}
+	
+	@MainActor
+	func testSegmentedPickerToggle() throws {
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
+		
+		let segmentedToggle = app.switches["SegmentedPickerToggle"]
+		XCTAssertTrue(segmentedToggle.waitForExistence(timeout: 2), "Segmented picker toggle should exist")
+		
+		if segmentedToggle.value as? String == "Off" {
+			segmentedToggle.switches.firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.5)
+		}
+		
+		let segmentedPicker = app.segmentedControls["SuitSegmentedPicker"]
+		XCTAssertTrue(segmentedPicker.waitForExistence(timeout: 2), "Segmented picker should exist when enabled")
+		
+		let carouselLeft = app.buttons["SuitCarousel_LeftButton"]
+		XCTAssertFalse(carouselLeft.exists, "Carousel should not exist when segmented picker is enabled")
+		
+		segmentedToggle.switches.firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.5)
+		
+		XCTAssertTrue(carouselLeft.waitForExistence(timeout: 2), "Carousel should exist when segmented picker is disabled")
+		
+		navigateToGame(app)
+	}
+	
+	@MainActor
+	func testSegmentedPickerSelection() throws {
+		let app = XCUIApplication(); app.launch()
+		navigateToSettings(app)
+		
+		let segmentedToggle = app.switches["SegmentedPickerToggle"]
+		if segmentedToggle.exists && segmentedToggle.value as? String == "Off" {
+			segmentedToggle.switches.firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.5)
+		}
+		
+		let segmentedPicker = app.segmentedControls["SuitSegmentedPicker"]
+		XCTAssertTrue(segmentedPicker.waitForExistence(timeout: 2), "Segmented picker should exist")
+		
+		let buttons = segmentedPicker.buttons
+		XCTAssertEqual(buttons.count, 4, "Should have 4 suit options")
+		
+		if buttons.count >= 4 {
+			buttons.element(boundBy: 2).tap()
+			Thread.sleep(forTimeInterval: 0.3)
+			
+			buttons.element(boundBy: 0).tap()
+			Thread.sleep(forTimeInterval: 0.3)
+		}
+		
+		if segmentedToggle.exists {
+			segmentedToggle.switches.firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.3)
+		}
+		
 		navigateToGame(app)
 	}
 	

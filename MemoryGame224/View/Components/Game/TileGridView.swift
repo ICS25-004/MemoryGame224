@@ -1,10 +1,3 @@
-//
-//  TileGridView.swift
-//  MemoryGame224
-//
-//  Created by Caleb on 2026-02-09.
-//
-
 import SwiftUI
 
 /// Displays the game board as an interactive grid of tiles.

@@ -1,33 +1,63 @@
-//
-//  Board.swift
-//  MemoryGame224
-//
-//  Created by Caleb on 2026-01-29.
-//
-
 import Observation
 
-/// Represents the game board containing a grid of tiles.
+/// Represents the game board containing a grid of tiles for the memory game.
+///
+/// The board manages an n x n grid of tiles, randomly placing treasures and an optional
+/// bonus tile. Once created, the board's size and treasure type cannot be changed.
 @Observable class Board {
+    // MARK: - Constants
+    
+    /// Minimum allowed board size.
+    private static let minimumSize = 5
+    
+    /// Maximum allowed board size.
+    private static let maximumSize = 10
+    
+    /// Percentage of tiles that contain treasures (0.25 = 25%).
+    private static let treasurePercentage = 0.25
+    
+    /// Default SF Symbol name for empty tiles.
+    private static let emptyTileIcon = "circle.dotted"
+    
+    /// SF Symbol name for bonus tiles.
+    private static let bonusTileIcon = "star.hexagon.fill"
+    
+    // MARK: - Properties
+    
     /// The size of the board (n x n).
+    ///
+    /// Valid sizes range from 5 to 10, creating grids from 25 to 100 tiles.
     let size: Int
     
     /// 2D array of tiles representing the game board.
+    ///
+    /// Organized as rows and columns, where tiles[row][column] accesses a specific tile.
+    /// The array is populated during initialization with all tiles configured.
     var tiles: [[Tile]] = []
     
     /// The treasure icon to use (system image name).
+    ///
+    /// Stores the SF Symbol name that represents treasures on the board.
     let treasure: String
     
     /// Whether the board has a bonus tile.
+    ///
+    /// When true, one additional special tile with bonus functionality is placed.
     let hasBonus: Bool
     
-    /// Initializes a new board with the specified size and treasure.
+    /// Initializes a new board with the specified configuration.
+    ///
+    /// Creates an n x n grid of tiles, randomly distributes treasures on 25% of tiles,
+    /// and optionally places one bonus tile. Returns nil if the size is invalid.
+    ///
     /// - Parameters:
-    ///   - size: The size of the board (must be in range 5...10).
-    ///   - treasure: The system image name for the treasure icon.
-    ///   - hasBonus: Whether to include a bonus tile on the board.
+    ///   - size: The dimension of the square board. Must be between 5 and 10 (inclusive).
+    ///   - treasure: The SF Symbol name for treasure icons (e.g., "suit.heart.fill").
+    ///   - hasBonus: Whether to include one special bonus tile. Defaults to false.
+    /// - Returns: A configured Board instance, or nil if size is outside valid range.
+    /// - Note: Automatically creates tiles and places treasures upon successful initialization.
     init?(size: Int, treasure: String, hasBonus: Bool = false) {
-        guard (5...10).contains(size) else { return nil }
+        guard (Board.minimumSize...Board.maximumSize).contains(size) else { return nil }
         
         self.size = size
         self.treasure = treasure
@@ -44,6 +74,11 @@ import Observation
     // MARK: - Private Methods
     
     /// Creates an n x n grid of empty tiles.
+    ///
+    /// Populates the tiles array with size x size Tile instances,
+    /// all initialized to their default empty state.
+    ///
+    /// - Note: Modifies the tiles property by appending rows of new Tile instances.
     private func createTiles() {
         for _ in 0..<size {
             var row: [Tile] = []
@@ -54,10 +89,15 @@ import Observation
         }
     }
     
-    /// Places treasures randomly on 25% of the tiles (truncated to integer).
+    /// Randomly places treasures on 25% of the board's tiles.
+    ///
+    /// Calculates the treasure count as (size * size * treasurePercentage), truncating to an integer.
+    /// Uses random positioning to ensure treasures are distributed unpredictably.
+    ///
+    /// - Note: Modifies tile contents by setting the treasure icon on selected tiles.
     private func placeTreasures() {
         let allPositions = generateShuffledPositions()
-        let treasureCount = size * size / 4
+        let treasureCount = Int(Double(size * size) * Board.treasurePercentage)
         
         for i in 0..<treasureCount {
             let (row, col) = allPositions[i]
@@ -65,21 +105,30 @@ import Observation
         }
     }
     
-    /// Places a bonus tile randomly on an empty tile.
+    /// Randomly places one bonus tile on an empty (non-treasure) tile.
+    ///
+    /// Searches for the first available empty tile in a randomized order and marks it
+    /// as the bonus tile with a special star icon. Does nothing if no empty tiles exist.
+    ///
+    /// - Note: Modifies one tile's isBonus flag and contents property.
     private func placeBonusTile() {
         let allPositions = generateShuffledPositions()
         
         for (row, col) in allPositions {
-            if tiles[row][col].contents == "circle.dotted" {
+            if tiles[row][col].contents == Board.emptyTileIcon {
                 tiles[row][col].isBonus = true
-                tiles[row][col].contents = "star.hexagon.fill"
+                tiles[row][col].contents = Board.bonusTileIcon
                 return
             }
         }
     }
     
-    /// Generates all tile positions and returns them in shuffled order.
-    /// - Returns: Array of shuffled (row, col) tuples.
+    /// Generates all tile positions in random order.
+    ///
+    /// Creates a complete list of (row, column) coordinates for every tile on the board,
+    /// then shuffles them to provide random ordering for treasure and bonus placement.
+    ///
+    /// - Returns: Array of (Int, Int) tuples representing shuffled (row, column) positions.
     private func generateShuffledPositions() -> [(Int, Int)] {
         var positions: [(Int, Int)] = []
         
@@ -94,8 +143,12 @@ import Observation
     
     // MARK: - Public Methods
     
-    /// Counts the number of unrevealed treasure tiles.
-    /// - Returns: The count of treasures that have not been revealed.
+    /// Counts the number of unrevealed treasure tiles remaining on the board.
+    ///
+    /// Iterates through all tiles to find those that contain treasures and have not
+    /// yet been revealed by the player. Useful for tracking game progress.
+    ///
+    /// - Returns: The count of treasure tiles that are still hidden (not revealed).
     func countUnrevealedTreasures() -> Int {
         var count = 0
         

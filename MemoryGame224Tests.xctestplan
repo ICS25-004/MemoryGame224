@@ -18,7 +18,7 @@
   },
   "testTargets" : [
     {
-      "enabled" : false,
+      "enabled" : true,
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:MemoryGame224.xcodeproj",

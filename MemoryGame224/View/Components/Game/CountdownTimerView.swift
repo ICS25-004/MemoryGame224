@@ -1,10 +1,3 @@
-//
-//  CountdownTimerView.swift
-//  MemoryGame224
-//
-//  Created by Caleb on 2026-02-09.
-//
-
 import SwiftUI
 
 /// Displays a countdown timer that transitions to a "Go!" message when complete.
