@@ -9,9 +9,5 @@ import Testing
 @testable import MemoryGame224
 
 struct MemoryGame224Tests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    }
-
+//
 }

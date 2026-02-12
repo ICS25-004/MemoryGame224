@@ -13,28 +13,28 @@ struct SuitThumbnail: View {
 	
 	/// The currently selected suit index.
 	@Binding var selectedSuitIndex: Int
-
-    var body: some View {
-			Button(action: {
-				selectedSuitIndex = currentIndex
-			}) {
-				VStack(spacing: 4) {
-					Image(systemName: currentSuit.iconName)
-						.frame(width: 44, height: 44)
-						.foregroundStyle(currentSuit.color)
-						.overlay(
-							RoundedRectangle(cornerRadius: 8)
-								.stroke(
-									currentIndex == selectedSuitIndex ? Color.accentColor : Color.clear, lineWidth: 2
-								)
-						)
-						.background(
-							RoundedRectangle(cornerRadius: 8)
-								.fill(Color.white)
-						)
-				}
+	
+	var body: some View {
+		Button(action: {
+			selectedSuitIndex = currentIndex
+		}) {
+			VStack(spacing: 4) {
+				Image(systemName: currentSuit.iconName)
+					.frame(width: 44, height: 44)
+					.foregroundStyle(currentSuit.color)
+					.overlay(
+						RoundedRectangle(cornerRadius: 8)
+							.stroke(
+								currentIndex == selectedSuitIndex ? Color.accentColor : Color.clear, lineWidth: 2
+							)
+					)
+					.background(
+						RoundedRectangle(cornerRadius: 8)
+							.fill(Color.white)
+					)
 			}
-			.accessibilityAddTraits(.isButton)
-			.accessibilityIdentifier("SuitThumbnail_Icon_\(currentSuit.rawValue)")
-    }
+		}
+		.accessibilityAddTraits(.isButton)
+		.accessibilityIdentifier("SuitThumbnail_Icon_\(currentSuit.rawValue)")
+	}
 }

@@ -13,24 +13,20 @@ struct SettingsView: View {
 	/// Whether the board includes a bonus tile, stored in UserDefaults.
 	///
 	/// Changes trigger board reinitialization.
-	@AppStorage("hasBonusTile") private var hasBonusTile: Bool = false
-		
+	@AppStorage("hasBonus") private var hasBonusTile: Bool = false
+	
 	/// The index of the currently selected suit in the suits array.
 	///
 	/// Bound to parent view to maintain selection across navigation.
 	@Binding var selectedSuitIndex: Int
 	
-	/// The array of available suits for treasure icons.
-	///
-	/// Bound to parent view to maintain suit customization.
-	@Binding var suits : [Suit]
-
 	/// The currently selected suit for treasure icons.
 	///
-	/// Safely accesses the suits array using the selected index, clamping to valid range.
-	private var selectedSuit: Suit { suits[min(max(selectedSuitIndex, 0), suits.count - 1)] }
-    
-
+	/// Safely accesses Suit.allCases using the selected index, clamping to valid range.
+	private var selectedSuit: Suit {
+		let suits = Array(Suit.allCases)
+		return suits[min(max(selectedSuitIndex, 0), suits.count - 1)]
+	}
 	
 	var body: some View {
 		VStack(spacing: 20) {
@@ -46,32 +42,27 @@ struct SettingsView: View {
 						.shadow(color: .gray, radius: 10)
 				)
 				.padding(.bottom, 30)
-
-			SuitCarousel(suits: $suits, selectedSuitIndex: $selectedSuitIndex)
+			
+			SuitCarousel(selectedSuitIndex: $selectedSuitIndex)
 			Group {
 				Stepper(value: $rowsAndColumns, in: 5...10) {
 					Text("Rows & Columns: \(rowsAndColumns)")
 				}
 				.accessibilityIdentifier("rowsAndColumnsStepper")
 			}
-				
-	
-			HStack {
-				Image(systemName: "star.hexagon.fill")
-					.foregroundStyle(.tint)
-				Spacer()
-				Toggle(
-                    "Bonus Tile",
-                    systemImage: "star.hexagon.fill",                   isOn: $hasBonusTile)
-				
-			}
-			.contentShape(Rectangle())
+			
+			Toggle(
+				"Bonus Tile",
+				systemImage: "star.hexagon.fill",
+				isOn: $hasBonusTile
+			)
+			.foregroundStyle(Color.yellow)
 			.onTapGesture {
 				hasBonusTile.toggle()
 			}
-			.accessibilityIdentifier("BonusTileToggle")
 			.accessibilityValue(hasBonusTile ? "On" : "Off")
-
+			.accessibilityIdentifier("BonusTileToggle")
+			
 		}
 		.padding()
 	}

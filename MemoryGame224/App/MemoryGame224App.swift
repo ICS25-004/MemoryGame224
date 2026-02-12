@@ -12,9 +12,9 @@ import SwiftUI
 /// Defines the app's scene structure and launches the initial RootView.
 @main
 struct MemoryGame224App: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+		}
+	}
 }

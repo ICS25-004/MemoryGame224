@@ -10,44 +10,29 @@ struct GameBoardView: View {
 	
 	/// Duration in seconds for the memorization countdown phase.
 	private static let countdownDuration = 4
-	
+
 	/// Timer interval in seconds for countdown updates.
 	private static let timerInterval: TimeInterval = 1
 	
 	// MARK: - Properties
-	
 	/// The board size (n x n) stored in UserDefaults.
-	///
-	/// Valid range is 5-10. Changes trigger board reinitialization.
 	@AppStorage("rows") private var rowsAndColumns = 5
 	
 	/// Whether the board includes a bonus tile, stored in UserDefaults.
-	///
-	/// Changes trigger board reinitialization.
-	@AppStorage("hasBonusTile") private var hasBonusTile: Bool = false
+	@AppStorage("hasBonus") private var hasBonus: Bool = false
 	
 	/// The index of the currently selected suit in the suits array.
-	///
-	/// Bound to parent view to maintain selection across navigation.
 	@Binding var selectedSuitIndex: Int
 	
-	/// The array of available suits for treasure icons.
-	///
-	/// Bound to parent view to maintain suit customization.
-	@Binding var suits: [Suit]
-	
 	/// The current game board instance.
-	///
 	/// Optional because it's initialized after view appears. Nil indicates no active game.
 	@State private var board: Board?
 	
 	/// Whether treasure locations are currently visible to the player.
-	///
 	/// True during the 4-second memorization phase, false during gameplay.
-	@State private var treasuresVisible = true
+	@State private var showTreasure = true
 	
 	/// The number of tiles the player has tapped during the current game.
-	///
 	/// Resets to zero on bonus tile activation or board reinitialization.
 	@State private var tapCount: Int = 0
 	
@@ -63,22 +48,29 @@ struct GameBoardView: View {
 	
 	/// The currently selected suit for treasure icons.
 	///
-	/// Safely accesses the suits array using the selected index, clamping to valid range.
+	/// Safely accesses Suit.allCases using the selected index, clamping to valid range.
 	private var selectedSuit: Suit {
-		suits[min(max(selectedSuitIndex, 0), suits.count - 1)]
+		let suits = Array(Suit.allCases)
+		return suits[min(max(selectedSuitIndex, 0), suits.count - 1)]
 	}
-	
+
+	/// Tuple of all settings that trigger board reinitialization.
+	private var gameSettings: String {
+		"\(rowsAndColumns)-\(selectedSuit.id)-\(hasBonus)"
+	}
+
 	var body: some View {
 		VStack {
 			CountdownTimerView(
-				isCountingDown: treasuresVisible,
-				elapsedTime: elapsedTime
+				isCountingDown: showTreasure,
+				elapsedTime: elapsedTime,
+				countdownDuration: GameBoardView.countdownDuration
 			)
 			
 			if let board = board {
 				TileGridView(
 					board: board,
-					treasuresVisible: treasuresVisible,
+					treasuresVisible: showTreasure,
 					selectedSuit: selectedSuit,
 					onTileTap: handleTileTap
 				)
@@ -91,26 +83,14 @@ struct GameBoardView: View {
 				treasureCount: board?.countUnrevealedTreasures() ?? 0
 			)
 		}
-		.onAppear {
-			initializeBoard()
-		}
-		.onChange(of: rowsAndColumns) {
-			initializeBoard()
-		}
-		.onChange(of: selectedSuit) {
-			initializeBoard()
-		}
-		.onChange(of: hasBonusTile) {
-			initializeBoard()
-		}
+		.onAppear(perform: initializeBoard)
+		.onChange(of: gameSettings, initializeBoard)
 		.onReceive(timer) { _ in
-			if treasuresVisible {
-				elapsedTime += 1
-				if elapsedTime >= GameBoardView.countdownDuration {
-					treasuresVisible = false
-					timer.upstream.connect().cancel()
-				}
-			}
+			guard showTreasure else { return }
+			elapsedTime += 1
+			guard elapsedTime >= GameBoardView.countdownDuration else { return }
+			showTreasure = false
+			timer.upstream.connect().cancel()
 		}
 	}
 	
@@ -123,8 +103,8 @@ struct GameBoardView: View {
 	///
 	/// - Note: Modifies board, treasuresVisible, tapCount, elapsedTime, and timer properties.
 	private func initializeBoard() {
-		board = Board(size: rowsAndColumns, treasure: selectedSuit.iconName, hasBonus: hasBonusTile)
-		treasuresVisible = true
+		board = Board(size: rowsAndColumns, treasure: selectedSuit.iconName, hasBonus: hasBonus)
+		showTreasure = true
 		tapCount = 0
 		elapsedTime = 0
 		timer = Timer.publish(every: GameBoardView.timerInterval, on: .main, in: .common).autoconnect()
@@ -139,16 +119,14 @@ struct GameBoardView: View {
 	/// - Parameter tile: The tile that was tapped by the user.
 	/// - Note: Modifies the tile's isRevealed and bonusUsed properties, and the tapCount property.
 	private func handleTileTap(_ tile: Tile) {
-		guard !treasuresVisible else { return }
+		guard !showTreasure, !tile.isRevealed else { return }
 		
-		if !tile.isRevealed {
-			tile.isRevealed = true
-			if tile.isBonus && !tile.bonusUsed {
-				tile.bonusUsed = true
-				tapCount = 0
-			} else {
-				tapCount += 1
-			}
+		tile.isRevealed = true
+
+		if tile.isBonus && !tile.bonusUsed {
+			tile.bonusUsed = true; tapCount = 0
+		} else {
+			tapCount += 1
 		}
 	}
 }

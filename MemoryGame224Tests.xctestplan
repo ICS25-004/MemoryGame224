@@ -18,7 +18,7 @@
   },
   "testTargets" : [
     {
-      "enabled" : true,
+      "enabled" : false,
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:MemoryGame224.xcodeproj",
@@ -27,11 +27,6 @@
       }
     },
     {
-      "skippedTests" : [
-        "MemoryGame224UITests",
-        "MemoryGame224UITests\/testExample()",
-        "MemoryGame224UITests\/testLaunchPerformance()"
-      ],
       "target" : {
         "containerPath" : "container:MemoryGame224.xcodeproj",
         "identifier" : "245797CC2F0C40010038AED1",

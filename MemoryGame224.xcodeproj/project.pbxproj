@@ -38,6 +38,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		24033FCB2F3DB28200C62274 /* Exceptions for "MemoryGame224" folder in "MemoryGame224" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 245797B52F0C40000038AED1 /* MemoryGame224 */;
+		};
 		24A329BF2F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224Tests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -55,14 +62,11 @@
 				Model/Tile.swift,
 				View/Components/Game/CountdownTimerView.swift,
 				View/Components/Game/GameStatsFooter.swift,
-				View/Components/Game/NavigationChevrons.swift,
 				View/Components/Game/TileGridView.swift,
 				View/Components/Settings/SuitCarousel.swift,
 				View/Components/Settings/SuitThumbnail.swift,
-				View/Components/SuitDisplayCard.swift,
 				View/Screens/ContentView.swift,
 				View/Screens/GameBoardView.swift,
-				View/Screens/GameViewRetired.swift,
 				View/Screens/SettingsView.swift,
 			);
 			target = 245797CC2F0C40010038AED1 /* MemoryGame224UITests */;
@@ -73,6 +77,7 @@
 		245797B82F0C40000038AED1 /* MemoryGame224 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				24033FCB2F3DB28200C62274 /* Exceptions for "MemoryGame224" folder in "MemoryGame224" target */,
 				24A329BF2F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224Tests" target */,
 				24A329C02F0FFF500008C926 /* Exceptions for "MemoryGame224" folder in "MemoryGame224UITests" target */,
 			);
@@ -458,12 +463,11 @@
 				DEVELOPMENT_TEAM = 5GXY6J3HHB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = MemoryGame224/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Memory Game";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.card-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -495,12 +499,11 @@
 				DEVELOPMENT_TEAM = 5GXY6J3HHB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = MemoryGame224/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Memory Game";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.card-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
