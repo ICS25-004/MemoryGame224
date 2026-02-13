@@ -15,13 +15,9 @@ struct ContentView: View {
 		NavigationStack {
 			Group {
 				if showingSettings {
-					SettingsView(
-						selectedSuitIndex: $suitIndex
-					)
+					SettingsView(selectedSuitIndex: $suitIndex)
 				} else {
-					GameBoardView(
-						selectedSuitIndex: $suitIndex
-					)
+					GameBoardView(selectedSuitIndex: $suitIndex)
 				}
 			}
 			.toolbar {

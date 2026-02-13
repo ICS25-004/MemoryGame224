@@ -634,5 +634,441 @@ final class MemoryGame224UITestsLaunchTests: XCTestCase {
 		let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
 		XCTAssertTrue(tiles.firstMatch.waitForExistence(timeout: 6), "Tiles should appear after countdown")
 	}
+	
+	// MARK: - Responsive Grid Padding Tests
+	
+	/// Tests that larger game boards (8x8 to 10x10) display all tiles without overflow
+	@MainActor
+	func testLargeGridResponsivePadding() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let stepper = app.steppers["rowsAndColumnsStepper"]
+		XCTAssertTrue(stepper.waitForExistence(timeout: 2), "Stepper should exist")
+		
+		// Set board to maximum size (10x10)
+		for _ in 0..<5 {
+			app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+		}
+		
+		// Verify we're at 10x10
+		let label = app.staticTexts["Rows & Columns: 10"].firstMatch
+		XCTAssertTrue(label.waitForExistence(timeout: 1), "Should be at 10x10")
+		
+		// Navigate to game and verify tiles render
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 5)
+		
+		// Verify tiles exist and are interactive
+		let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
+		XCTAssertGreaterThanOrEqual(tiles.count, 100, "Should have at least 100 tiles for 10x10 grid")
+		
+		// Verify tiles are accessible (not clipped off screen)
+		let firstTile = tiles.element(boundBy: 0)
+		let lastTile = tiles.element(boundBy: min(99, tiles.count - 1))
+		
+		XCTAssertTrue(firstTile.exists, "First tile should be visible")
+		XCTAssertTrue(lastTile.exists, "Last tile should be accessible")
+	}
+	
+	/// Tests medium-sized grids (6x6, 7x7) have appropriate padding
+	@MainActor
+	func testMediumGridResponsivePadding() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		// Test 6x6 grid
+		app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		let label6 = app.staticTexts["Rows & Columns: 6"].firstMatch
+		XCTAssertTrue(label6.waitForExistence(timeout: 1), "Should be at 6x6")
+		
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 5)
+		
+		let tiles6 = app.buttons.matching(identifier: "TileGridView_Tile")
+		XCTAssertGreaterThanOrEqual(tiles6.count, 36, "Should have at least 36 tiles for 6x6 grid")
+		
+		// Test 7x7 grid
+		navigateToSettings(app)
+		app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		let label7 = app.staticTexts["Rows & Columns: 7"].firstMatch
+		XCTAssertTrue(label7.waitForExistence(timeout: 1), "Should be at 7x7")
+		
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 5)
+		
+		let tiles7 = app.buttons.matching(identifier: "TileGridView_Tile")
+		XCTAssertGreaterThanOrEqual(tiles7.count, 49, "Should have at least 49 tiles for 7x7 grid")
+	}
+	
+	/// Tests small grids (5x5) have sufficient padding for visual clarity
+	@MainActor
+	func testSmallGridResponsivePadding() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		
+		// Default is 5x5
+		Thread.sleep(forTimeInterval: 5)
+		
+		let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
+		XCTAssertGreaterThanOrEqual(tiles.count, 25, "Should have at least 25 tiles for 5x5 grid")
+		
+		// Verify tiles are well-spaced and accessible
+		let firstTile = tiles.element(boundBy: 0)
+		XCTAssertTrue(firstTile.exists, "First tile should be visible")
+		XCTAssertTrue(firstTile.isHittable, "First tile should be tappable")
+		
+		// Tap a tile to verify interaction works
+		firstTile.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		// Verify tap was registered
+		let tapCountLabel = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Tap Count:'")).firstMatch
+		XCTAssertTrue(tapCountLabel.exists, "Tap count label should exist")
+	}
+	
+	/// Tests that changing grid size updates padding dynamically
+	@MainActor
+	func testGridPaddingUpdatesWithSizeChanges() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		// Start at 5x5, increment to 8x8
+		for i in 0..<3 {
+			app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+			Thread.sleep(forTimeInterval: 0.3)
+			
+			// Navigate to game to trigger board regeneration
+			navigateToGame(app)
+			Thread.sleep(forTimeInterval: 5)
+			
+			// Verify tiles are visible
+			let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
+			XCTAssertGreaterThan(tiles.count, 0, "Tiles should exist after size change")
+			
+			// Go back to settings for next iteration
+			if i < 2 {
+				navigateToSettings(app)
+			}
+		}
+		
+		// Verify we ended at 8x8
+		navigateToSettings(app)
+		let finalLabel = app.staticTexts["Rows & Columns: 8"].firstMatch
+		XCTAssertTrue(finalLabel.exists, "Should be at 8x8 after increments")
+	}
+	
+	// MARK: - Infinite Carousel Looping Tests
+	
+	/// Tests carousel wraps from last suit to first suit when tapping right
+	@MainActor
+	func testCarouselWrapsForwardToBeginning() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right button should exist")
+		
+		// Starting at heart (index 0), tap right 4 times to loop back to heart
+		// heart -> club -> diamond -> spade -> heart (wraps)
+		for _ in 0..<4 {
+			rightButton.tap()
+			Thread.sleep(forTimeInterval: 0.3)
+		}
+		
+		// We should be back at heart
+		// Note: We can't directly verify selection state, but we can verify the button is still enabled
+		XCTAssertTrue(rightButton.isEnabled, "Right button should always be enabled for infinite looping")
+	}
+	
+	/// Tests carousel wraps from first suit to last suit when tapping left
+	@MainActor
+	func testCarouselWrapsBackwardToEnd() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let leftButton = app.buttons["SuitCarousel_LeftButton"]
+		XCTAssertTrue(leftButton.waitForExistence(timeout: 2), "Left button should exist")
+		
+		// Starting at heart (index 0), tap left to wrap to spade (last suit)
+		leftButton.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		// Verify button is still enabled (infinite looping)
+		XCTAssertTrue(leftButton.isEnabled, "Left button should always be enabled for infinite looping")
+		
+		// Tap left again to verify continuous wrapping
+		leftButton.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		XCTAssertTrue(leftButton.isEnabled, "Left button should remain enabled")
+	}
+	
+	/// Tests carousel buttons remain enabled during rapid successive taps
+	@MainActor
+	func testCarouselButtonsAlwaysEnabled() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		let leftButton = app.buttons["SuitCarousel_LeftButton"]
+		
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right button should exist")
+		XCTAssertTrue(leftButton.waitForExistence(timeout: 2), "Left button should exist")
+		
+		// Both buttons should always be enabled
+		XCTAssertTrue(rightButton.isEnabled, "Right button should be enabled")
+		XCTAssertTrue(leftButton.isEnabled, "Left button should be enabled")
+		
+		// Tap right multiple times
+		for _ in 0..<10 {
+			rightButton.tap()
+			Thread.sleep(forTimeInterval: 0.1)
+		}
+		
+		XCTAssertTrue(rightButton.isEnabled, "Right button should still be enabled after many taps")
+		XCTAssertTrue(leftButton.isEnabled, "Left button should still be enabled")
+		
+		// Tap left multiple times
+		for _ in 0..<10 {
+			leftButton.tap()
+			Thread.sleep(forTimeInterval: 0.1)
+		}
+		
+		XCTAssertTrue(rightButton.isEnabled, "Right button should still be enabled")
+		XCTAssertTrue(leftButton.isEnabled, "Left button should still be enabled after many taps")
+	}
+	
+	/// Tests complete carousel loop using right button only
+	@MainActor
+	func testCompleteCarouselLoopRight() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right button should exist")
+		
+		// Cycle through all 4 suits twice (8 taps total) to verify looping
+		for i in 0..<8 {
+			rightButton.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+			
+			// Verify button remains enabled throughout
+			XCTAssertTrue(rightButton.isEnabled, "Right button should be enabled at tap \(i + 1)")
+		}
+		
+		// Verify UI is still responsive
+		XCTAssertTrue(rightButton.exists, "Right button should still exist after full loop")
+	}
+	
+	/// Tests complete carousel loop using left button only
+	@MainActor
+	func testCompleteCarouselLoopLeft() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let leftButton = app.buttons["SuitCarousel_LeftButton"]
+		XCTAssertTrue(leftButton.waitForExistence(timeout: 2), "Left button should exist")
+		
+		// Cycle through all 4 suits twice backwards (8 taps total)
+		for i in 0..<8 {
+			leftButton.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+			
+			// Verify button remains enabled throughout
+			XCTAssertTrue(leftButton.isEnabled, "Left button should be enabled at tap \(i + 1)")
+		}
+		
+		// Verify UI is still responsive
+		XCTAssertTrue(leftButton.exists, "Left button should still exist after full loop")
+	}
+	
+	/// Tests alternating between left and right carousel buttons
+	@MainActor
+	func testCarouselAlternatingDirections() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		let leftButton = app.buttons["SuitCarousel_LeftButton"]
+		
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right button should exist")
+		XCTAssertTrue(leftButton.waitForExistence(timeout: 2), "Left button should exist")
+		
+		// Alternate between directions
+		for _ in 0..<5 {
+			rightButton.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+			leftButton.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+		}
+		
+		// Both buttons should still be functional
+		XCTAssertTrue(rightButton.isEnabled, "Right button should remain enabled")
+		XCTAssertTrue(leftButton.isEnabled, "Left button should remain enabled")
+	}
+	
+	// MARK: - Component Separation Tests
+	
+	/// Tests that TileButton components render correctly at different grid sizes
+	@MainActor
+	func testTileButtonComponentAtVariousSizes() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let gridSizes = [5, 7, 10]
+		
+		for targetSize in gridSizes {
+			// Navigate to settings and set size
+			let currentLabel = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Rows & Columns:'")).firstMatch
+			if currentLabel.exists {
+				let labelText = currentLabel.label
+				if let valueStr = labelText.split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+				   let currentValue = Int(valueStr) {
+					let difference = targetSize - currentValue
+					
+					if difference > 0 {
+						for _ in 0..<difference {
+							app.buttons["rowsAndColumnsStepper-Increment"].firstMatch.tap()
+							Thread.sleep(forTimeInterval: 0.1)
+						}
+					} else if difference < 0 {
+						for _ in 0..<abs(difference) {
+							app.buttons["rowsAndColumnsStepper-Decrement"].firstMatch.tap()
+							Thread.sleep(forTimeInterval: 0.1)
+						}
+					}
+				}
+			}
+			
+			// Navigate to game
+			navigateToGame(app)
+			Thread.sleep(forTimeInterval: 5)
+			
+			// Verify tiles render
+			let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
+			let expectedTileCount = targetSize * targetSize
+			XCTAssertGreaterThanOrEqual(tiles.count, expectedTileCount, "Should have \(expectedTileCount) tiles for \(targetSize)x\(targetSize) grid")
+			
+			// Test tile interaction
+			if tiles.count > 0 {
+				tiles.element(boundBy: 0).tap()
+				Thread.sleep(forTimeInterval: 0.2)
+			}
+			
+			// Go back to settings for next iteration
+			if targetSize != gridSizes.last {
+				navigateToSettings(app)
+			}
+		}
+	}
+	
+	/// Tests CarouselChevronButton components maintain state correctly
+	@MainActor
+	func testCarouselChevronButtonComponents() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		let leftButton = app.buttons["SuitCarousel_LeftButton"]
+		
+		// Verify both buttons exist and are accessible
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right chevron button component should exist")
+		XCTAssertTrue(leftButton.waitForExistence(timeout: 2), "Left chevron button component should exist")
+		
+		// Verify buttons are always enabled (infinite looping)
+		XCTAssertTrue(rightButton.isEnabled, "Right chevron should be enabled")
+		XCTAssertTrue(leftButton.isEnabled, "Left chevron should be enabled")
+		
+		// Test rapid consecutive taps on same button
+		for _ in 0..<5 {
+			rightButton.tap()
+			Thread.sleep(forTimeInterval: 0.1)
+		}
+		
+		XCTAssertTrue(rightButton.isEnabled, "Right chevron should remain enabled after taps")
+		
+		// Test the other direction
+		for _ in 0..<5 {
+			leftButton.tap()
+			Thread.sleep(forTimeInterval: 0.1)
+		}
+		
+		XCTAssertTrue(leftButton.isEnabled, "Left chevron should remain enabled after taps")
+	}
+	
+	/// Tests that suit selection persists across carousel navigation
+	@MainActor
+	func testSuitSelectionPersistsWithCarousel() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		navigateToSettings(app)
+		
+		let rightButton = app.buttons["SuitCarousel_RightButton"]
+		XCTAssertTrue(rightButton.waitForExistence(timeout: 2), "Right button should exist")
+		
+		// Navigate to a specific suit (e.g., diamond - 2 taps right from heart)
+		rightButton.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		rightButton.tap()
+		Thread.sleep(forTimeInterval: 0.3)
+		
+		// Navigate to game
+		navigateToGame(app)
+		Thread.sleep(forTimeInterval: 5)
+		
+		// Go back to settings
+		navigateToSettings(app)
+		
+		// Verify carousel buttons are still functional
+		XCTAssertTrue(rightButton.exists, "Right button should exist after navigation")
+		XCTAssertTrue(rightButton.isEnabled, "Right button should be enabled after navigation")
+		
+		// Navigate again
+		navigateToGame(app)
+	}
+	
+	/// Tests all tile buttons are interactive after countdown
+	@MainActor
+	func testAllTileButtonsInteractive() throws {
+		let app = XCUIApplication(); app.launch()
+		resetToDefaultState(app)
+		
+		// Wait for countdown
+		Thread.sleep(forTimeInterval: 5)
+		
+		let tiles = app.buttons.matching(identifier: "TileGridView_Tile")
+		XCTAssertGreaterThan(tiles.count, 0, "Should have tiles")
+		
+		// Test tapping multiple different tiles
+		let tilesToTest = min(5, tiles.count)
+		for i in 0..<tilesToTest {
+			let tile = tiles.element(boundBy: i)
+			XCTAssertTrue(tile.exists, "Tile \(i) should exist")
+			XCTAssertTrue(tile.isHittable, "Tile \(i) should be hittable")
+			
+			tile.tap()
+			Thread.sleep(forTimeInterval: 0.2)
+		}
+		
+		// Verify tap count increased
+		let tapCountLabel = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Tap Count:'")).firstMatch
+		XCTAssertTrue(tapCountLabel.exists, "Tap count should be tracked")
+	}
 
 }

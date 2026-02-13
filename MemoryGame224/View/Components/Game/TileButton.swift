@@ -17,6 +17,9 @@ struct TileButton: View {
 	/// The currently selected suit for determining treasure icon colors.
 	let selectedSuit: Suit
 	
+	/// The size of the board (n x n) for adaptive icon sizing.
+	let boardSize: Int
+	
 	/// Closure called when the tile is tapped.
 	let onTap: (Tile) -> Void
 	
@@ -25,11 +28,14 @@ struct TileButton: View {
 			onTap(tile)
 		} label: {
 			Image(systemName: tileImageName)
-				.font(.largeTitle)
+				.font(.system(size: iconSize))
 				.foregroundStyle(tileColor)
+				.frame(width: iconSize, height: iconSize)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
 		.accessibilityIdentifier("TileGridView_Tile")
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.aspectRatio(1, contentMode: .fit)
 	}
 	
 	/// Determines the SF Symbol name to display for the tile based on game state.
@@ -45,13 +51,34 @@ struct TileButton: View {
 	
 	/// Determines the color to apply to the tile's icon.
 	///
-	/// Returns yellow for bonus tiles when visible, the suit's color (red or black) when
-	/// the tile is visible and contains the selected treasure, or primary color for all other cases.
+	/// Returns the bonus color for bonus tiles when visible, the appropriate suit color (red or black)
+	/// when the tile is visible and contains a treasure, or primary color for all other cases.
 	///
-	/// - Returns: Color for the tile icon (yellow for bonus, suit color, or primary).
+	/// - Returns: Color for the tile icon (bonus color, suit color, or primary).
 	private var tileColor: Color {
-		if (treasuresVisible || tile.isRevealed) && tile.isBonus { .yellow }
-		else if (treasuresVisible || tile.isRevealed) && tile.contents == selectedSuit.iconName { selectedSuit.color }
+		if (treasuresVisible || tile.isRevealed) && tile.isBonus { Suit.bonusColor }
+		else if (treasuresVisible || tile.isRevealed),
+						let tileSuit = Suit.allCases.first(where: {
+							$0.iconName == tile.contents
+						})
+		{ tileSuit.color }
 		else { .primary }
+	}
+	
+	/// Calculates the appropriate icon size based on board dimensions.
+	///
+	/// Larger boards use moderately smaller icons, compensated by reduced spacing.
+	/// Smaller boards use larger icons for better visibility.
+	///
+	/// - Returns: Font size in points for the SF Symbol icon.
+	private var iconSize: CGFloat {
+		switch boardSize {
+		case ...5: return 32
+		case 6: return 28
+		case 7: return 26
+		case 8: return 24
+		case 9: return 22
+		default: return 20
+		}
 	}
 }

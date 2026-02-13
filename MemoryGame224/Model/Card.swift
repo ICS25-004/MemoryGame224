@@ -39,4 +39,12 @@ enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
 	var title: String {
 		 self.rawValue.capitalized
 	}
+	
+	// MARK: - Bonus Tile Configuration
+	
+	/// The SF Symbol name for bonus tiles.
+	static let bonusIconName = "theatermasks.fill"
+	
+	/// The color for bonus tiles (light purple).
+	static let bonusColor = Color(red: 0.7, green: 0.5, blue: 0.9)
 }

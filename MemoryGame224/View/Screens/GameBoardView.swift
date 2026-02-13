@@ -33,11 +33,10 @@ struct GameBoardView: View {
 	@State private var showTreasure = true
 	
 	/// The number of tiles the player has tapped during the current game.
-	/// Resets to zero on bonus tile activation or board reinitialization.
+	/// Resets to zero on bonus tile activation and/or board reinitialization.
 	@State private var tapCount: Int = 0
 	
 	/// Timer that fires every second during the countdown phase.
-	///
 	/// Automatically connects on initialization and cancels after countdown completes.
 	@State private var timer = Timer.publish(every: GameBoardView.timerInterval, on: .main, in: .common).autoconnect()
 	
@@ -54,9 +53,12 @@ struct GameBoardView: View {
 		return suits[min(max(selectedSuitIndex, 0), suits.count - 1)]
 	}
 
-	/// Tuple of all settings that trigger board reinitialization.
+	/// Tuple of settings that trigger board reinitialization.
+	///
+	/// Only includes board size and bonus tile setting. Suit selection does not
+	/// trigger reinitialization since it only affects visual appearance, not board layout.
 	private var gameSettings: String {
-		"\(rowsAndColumns)-\(selectedSuit.id)-\(hasBonus)"
+		"\(rowsAndColumns)-\(hasBonus)"
 	}
 
 	var body: some View {
@@ -123,10 +125,7 @@ struct GameBoardView: View {
 		
 		tile.isRevealed = true
 
-		if tile.isBonus && !tile.bonusUsed {
-			tile.bonusUsed = true; tapCount = 0
-		} else {
-			tapCount += 1
-		}
+		if tile.isBonus && !tile.bonusUsed { tile.bonusUsed = true; tapCount = 0 }
+		else { tapCount += 1 }
 	}
 }

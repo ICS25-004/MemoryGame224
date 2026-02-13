@@ -5,9 +5,6 @@ import SwiftUI
 /// Renders all tiles in a responsive grid layout where each tile can be tapped to reveal
 /// its contents. The appearance of tiles changes based on game state (memorization vs. gameplay).
 struct TileGridView: View {
-	/// SF Symbol name for hidden tiles during gameplay.
-	private static let hiddenTileIcon = "questionmark.app"
-	
 	/// The game board containing all tiles.
 	let board: Board
 	
@@ -21,56 +18,61 @@ struct TileGridView: View {
 	let onTileTap: (Tile) -> Void
 	
 	var body: some View {
-		Grid {
+		Grid(horizontalSpacing: gridSpacing, verticalSpacing: gridSpacing) {
 			ForEach(board.tiles.indices, id: \.self) { rowIndex in
 				GridRow {
 					ForEach(board.tiles[rowIndex], id: \.id) { tile in
-						Button {
-							onTileTap(tile)
-						} label: {
-							Image(systemName: getTileImageName(tile))
-								.font(.largeTitle)
-								.foregroundStyle(getTileColor(tile))
-						}
-						.accessibilityIdentifier("TileGridView_Tile")
-						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						TileButton(
+							tile: tile,
+							treasuresVisible: treasuresVisible,
+							selectedSuit: selectedSuit,
+							boardSize: board.size,
+							onTap: onTileTap
+						)
 					}
 				}
 			}
 		}
-		.frame(maxHeight: .infinity)
+		.aspectRatio(1, contentMode: .fit)
+		.padding(gridPadding)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 	
-	/// Determines the SF Symbol name to display for a tile based on game state.
+	/// Calculates adaptive spacing between tiles based on board size.
 	///
-	/// Shows the tile's actual contents during memorization phase or after it's revealed.
-	/// Shows a question mark icon for hidden tiles during gameplay.
+	/// Larger boards get minimal spacing to maximize icon size.
+	/// Smaller boards get more generous spacing for better visual separation.
 	///
-	/// - Parameter tile: The tile to determine the icon for.
-	/// - Returns: SF Symbol name string (e.g., "suit.heart.fill" or "questionmark.app").
-	private func getTileImageName(_ tile: Tile) -> String {
-		if treasuresVisible || tile.isRevealed {
-			tile.contents
-		} else {
-			TileGridView.hiddenTileIcon
+	/// - Returns: Spacing value in points (1-8).
+	private var gridSpacing: CGFloat {
+		let size = board.tiles.count
+		switch size {
+		case ...5: return 8
+		case 6: return 6
+		case 7: return 4
+		case 8: return 3
+		case 9: return 2
+		default: return 1
 		}
 	}
 	
-	/// Determines the color to apply to a tile's icon.
+	/// Calculates adaptive padding around the entire grid based on board size.
 	///
-	/// Returns yellow for bonus tiles when visible, the suit's color (red or black) when
-	/// the tile is visible and contains the selected treasure, or primary color for all other cases.
+	/// Larger boards get minimal padding to maximize space for larger icons.
+	/// Smaller boards get more padding for better visual balance.
 	///
-	/// - Parameter tile: The tile to determine the color for.
-	/// - Returns: Color for the tile icon (yellow for bonus, suit color, or primary).
-	private func getTileColor(_ tile: Tile) -> Color {
-		if (treasuresVisible || tile.isRevealed) && tile.isBonus {
-			.yellow
-		} else if (treasuresVisible || tile.isRevealed)
-				&& tile.contents == selectedSuit.iconName {
-			selectedSuit.color
-		} else {
-			.primary
+	/// - Returns: Padding value in points (2-16).
+	private var gridPadding: CGFloat {
+		let size = board.tiles.count
+		switch size {
+		case ...5: return 16
+		case 6: return 12
+		case 7: return 8
+		case 8: return 6
+		case 9: return 4
+		default: return 2
 		}
 	}
+	
+
 }

@@ -19,9 +19,6 @@ import Observation
 	/// Default SF Symbol name for empty tiles.
 	private static let emptyTileIcon = "circle.dotted"
 	
-	/// SF Symbol name for bonus tiles.
-	private static let bonusTileIcon = "star.hexagon.fill"
-	
 	// MARK: - Properties
 	
 	/// The size of the board (n x n).
@@ -75,7 +72,7 @@ import Observation
 	/// - Note: Modifies the tiles property by appending rows of new Tile instances.
 	private func createTiles() {
 		for _ in 0..<size {
-			var row: [Tile] = []
+			var row = [Tile]()
 			for _ in 0..<size {
 				row.append(Tile())
 			}
@@ -111,7 +108,7 @@ import Observation
 		for (row, col) in allPositions {
 			if tiles[row][col].contents == Board.emptyTileIcon {
 				tiles[row][col].isBonus = true
-				tiles[row][col].contents = Board.bonusTileIcon
+				tiles[row][col].contents = Suit.bonusIconName
 				return
 			}
 		}

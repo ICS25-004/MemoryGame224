@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// Displays all available suits as thumbnails with left/right navigation buttons.
 /// Users can tap thumbnails directly or use chevron buttons to cycle through options.
-/// Tapping allows for infinite looping of suits... Swiping does not.
+/// Chevron buttons support infinite looping, wrapping from the last suit to the first and vice versa.
 struct SuitCarousel: View {
 	/// The currently selected suit index.
 	@Binding var selectedSuitIndex: Int
@@ -14,16 +14,11 @@ struct SuitCarousel: View {
 	
 	var body: some View {
 		HStack(spacing: 0) {
-			Button(
-				action: {
-					if selectedSuitIndex > 0 { selectedSuitIndex -= 1 }
-			}) {
-				Image(systemName: "chevron.left")
-					.padding(15)
-			}
-			.glassEffect(.regular.tint(.orange).interactive(), in: Circle())
-			.disabled(selectedSuitIndex == 0)
-			.accessibilityIdentifier("SuitCarousel_LeftButton")
+			CarouselChevronButton(
+				direction: .left,
+				selectedIndex: $selectedSuitIndex,
+				totalCount: suits.count
+			)
 			
 			Spacer()
 			
@@ -41,20 +36,11 @@ struct SuitCarousel: View {
 			
 			Spacer()
 			
-			Button(
-				action: {
-					if selectedSuitIndex < suits.count - 1 {
-						selectedSuitIndex += 1
-					}
-				},
-				label: {
-					Image(systemName: "chevron.right")
-						.padding(15)
-				}
+			CarouselChevronButton(
+				direction: .right,
+				selectedIndex: $selectedSuitIndex,
+				totalCount: suits.count
 			)
-			.glassEffect(.regular.tint(.orange).interactive(), in: Circle())
-			.disabled(selectedSuitIndex >= max(suits.count - 1, 0))
-			.accessibilityIdentifier("SuitCarousel_RightButton")
 		}
 		.padding(.horizontal)
 		.padding(.top, 24)

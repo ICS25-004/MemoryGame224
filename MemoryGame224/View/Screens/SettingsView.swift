@@ -53,10 +53,13 @@ struct SettingsView: View {
 			
 			Toggle(
 				"Bonus Tile",
-				systemImage: "star.hexagon.fill",
+				systemImage: Suit.bonusIconName,
 				isOn: $hasBonusTile
 			)
-			.foregroundStyle(Color.yellow)
+			.tint(Suit.bonusColor)
+			.foregroundStyle(hasBonusTile ? Suit.bonusColor : .primary)
+			.animation(.spring, value: hasBonusTile)
+			.symbolEffect(.bounce, value: hasBonusTile)
 			.onTapGesture {
 				hasBonusTile.toggle()
 			}
