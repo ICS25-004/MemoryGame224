@@ -1,7 +1,7 @@
 {
   "configurations" : [
     {
-      "id" : "D1BA3C8B-38A0-4512-8F17-434C33FFB020",
+      "id" : "0ED5B87D-381C-412B-BA0D-0FBFDA511D83",
       "name" : "Test Scheme Action",
       "options" : {
 
@@ -27,7 +27,6 @@
       }
     },
     {
-      "enabled" : false,
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:MemoryGame224.xcodeproj",
