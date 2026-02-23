@@ -5,9 +5,6 @@ import SwiftUI
 /// Displays the tile's contents with appropriate colors and icons based on game state.
 /// Responds to taps by invoking the provided closure.
 struct TileButton: View {
-	/// SF Symbol name for hidden tiles during gameplay.
-	private static let hiddenTileIcon = "questionmark.app"
-	
 	/// The tile to display.
 	let tile: Tile
 	
@@ -46,7 +43,7 @@ struct TileButton: View {
 	/// - Returns: SF Symbol name string (e.g., "suit.heart.fill" or "questionmark.app").
 	private var tileImageName: String {
 		if treasuresVisible || tile.isRevealed { tile.contents }
-		else { TileButton.hiddenTileIcon }
+		else { Tile.hiddenIcon }
 	}
 	
 	/// Determines the color to apply to the tile's icon.

@@ -16,7 +16,12 @@ struct GameBoardView: View {
 	
 	// MARK: - Properties
 	/// The board size (n x n) stored in UserDefaults.
+	#if os(watchOS)
+	/// ALWAYS Fixed at 5x5 for watchOS
+	private let rowsAndColumns = 5
+	#else
 	@AppStorage("rows") private var rowsAndColumns = 5
+	#endif
 	
 	/// Whether the board includes a bonus tile, stored in UserDefaults.
 	@AppStorage("hasBonus") private var hasBonus: Bool = false
@@ -55,13 +60,35 @@ struct GameBoardView: View {
 
 	/// Tuple of settings that trigger board reinitialization.
 	///
-	/// Only includes board size and bonus tile setting. Suit selection does not
-	/// trigger reinitialization since it only affects visual appearance, not board layout.
+	/// Includes board size, bonus tile setting, and suit selection. Changes to any of these
+	/// settings will trigger a new board to be created with the updated configuration.
 	private var gameSettings: String {
-		"\(rowsAndColumns)-\(hasBonus)"
+		"\(rowsAndColumns)-\(hasBonus)-\(selectedSuitIndex)"
 	}
 
 	var body: some View {
+		#if os(watchOS)
+		// watchOS: Compact layout with 5x5 grid
+		WatchGameBoardContent(
+			board: board,
+			showTreasure: showTreasure,
+			elapsedTime: elapsedTime,
+			countdownDuration: GameBoardView.countdownDuration,
+			selectedSuit: selectedSuit,
+			tapCount: tapCount,
+			onTileTap: handleTileTap
+		)
+		.onAppear(perform: initializeBoard)
+		.onChange(of: gameSettings, initializeBoard)
+		.onReceive(timer) { _ in
+			guard showTreasure else { return }
+			elapsedTime += 1
+			guard elapsedTime >= GameBoardView.countdownDuration else { return }
+			showTreasure = false
+			timer.upstream.connect().cancel()
+		}
+		#else
+		// iOS: Standard layout with components
 		VStack {
 			CountdownTimerView(
 				isCountingDown: showTreasure,
@@ -94,6 +121,7 @@ struct GameBoardView: View {
 			showTreasure = false
 			timer.upstream.connect().cancel()
 		}
+		#endif
 	}
 	
 	// MARK: - Private Methods
@@ -129,3 +157,4 @@ struct GameBoardView: View {
 		else { tapCount += 1 }
 	}
 }
+

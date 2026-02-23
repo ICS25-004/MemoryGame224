@@ -29,6 +29,14 @@ struct SettingsView: View {
 	}
 	
 	var body: some View {
+		#if os(watchOS)
+		// watchOS: Compact black background with chevron suit selector
+		WatchSettingsContent(
+			selectedSuitIndex: $selectedSuitIndex,
+			hasBonusTile: $hasBonusTile
+		)
+		#else
+		// iOS: Standard layout with carousel
 		VStack(spacing: 20) {
 			Image(systemName: selectedSuit.iconName)
 				.resizable()
@@ -68,5 +76,6 @@ struct SettingsView: View {
 			
 		}
 		.padding()
+		#endif
 	}
 }

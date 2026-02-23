@@ -10,6 +10,9 @@ import Observation
 	/// Default SF Symbol name for empty tiles.
 	static let defaultIcon = "circle.dotted"
 	
+	/// SF Symbol name for hidden tiles during gameplay.
+	static let hiddenIcon = "questionmark.app"
+	
 	// MARK: - Properties
 	/// The content displayed on the tile as an SF Symbol name.
 	/// Defaults to "circle.dotted" for empty tiles. May be set to a treasure icon

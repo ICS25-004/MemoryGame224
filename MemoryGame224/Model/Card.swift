@@ -11,7 +11,7 @@ enum Suit: String, CaseIterable, Identifiable, Equatable, Codable {
 	case heart, club, diamond, spade
 	
 	/// The color associated with this suit.
-	/// Hearts and diamonds are red, clubs and spades are black,
+	/// Hearts and diamonds are red, clubs and spades are black.
 	var color: Color {
 		switch self {
 			case .heart, .diamond:
